@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoDash — Panduan Setup Lengkap</title>
+<style>
+/* ─── Base ─────────────────────────────────────── */
+:root{
+  --bg:#0A0E14; --bg2:#111820; --bg3:#1a2332;
+  --cyan:#00AEEF; --green:#00FF66; --orange:#FF8C00;
+  --red:#FF4444; --text:#E8F0FE; --dim:#8B9BAD; --muted:#3D4F63;
+  --radius:10px; --r:6px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg); color:var(--text);
+  line-height:1.6; font-size:15px;
+}
+a{color:var(--cyan);}
+
+/* ─── Layout ───────────────────────────────────── */
+.container{max-width:860px;margin:0 auto;padding:0 20px 60px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.grid2{grid-template-columns:1fr;}}
+
+/* ─── Header ───────────────────────────────────── */
+.hero{
+  text-align:center; padding:40px 20px 32px;
+  background:linear-gradient(180deg,#0d1a2a,var(--bg));
+  border-bottom:1px solid var(--muted);
+  margin-bottom:32px;
+}
+.hero-icon{font-size:52px;display:block;margin-bottom:12px;}
+.hero h1{
+  font-size:2rem;font-weight:900;letter-spacing:4px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero p{color:var(--dim);margin-top:8px;font-size:14px;}
+
+/* ─── Step Cards ───────────────────────────────── */
+.step{
+  background:var(--bg2); border:1px solid var(--muted);
+  border-radius:var(--radius); margin-bottom:20px;
+  overflow:hidden; transition:border-color .2s;
+}
+.step.done{border-color:var(--green);}
+.step.active{border-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan)22;}
+
+.step-header{
+  display:flex; align-items:center; gap:14px;
+  padding:16px 20px; cursor:pointer;
+  user-select:none; background:var(--bg3);
+}
+.step-num{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--muted);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;flex-shrink:0;
+  transition:background .2s;
+}
+.step.done  .step-num{background:var(--green);color:#000;}
+.step.active .step-num{background:var(--cyan);color:#000;}
+
+.step-title{font-size:16px;font-weight:700;flex:1;}
+.step-badge{
+  font-size:11px;padding:3px 10px;border-radius:20px;
+  background:var(--muted)22;border:1px solid var(--muted);
+  color:var(--dim);
+}
+.step.done .step-badge{background:var(--green)22;border-color:var(--green);color:var(--green);}
+.step.active .step-badge{background:var(--cyan)22;border-color:var(--cyan);color:var(--cyan);}
+
+.step-body{padding:20px; display:none;}
+.step.active .step-body{display:block;}
+
+/* ─── Code blocks ──────────────────────────────── */
+.code-block{position:relative;margin:10px 0;}
+.code-block pre{
+  background:#050B12; border:1px solid var(--muted);
+  border-radius:var(--r); padding:14px 16px;
+  font-family:'Cascadia Code','Fira Code','Consolas',monospace;
+  font-size:13px; color:#A8D8EA; overflow-x:auto;
+  white-space:pre-wrap; word-break:break-all;
+  line-height:1.7;
+}
+.code-block pre .cmd-var{color:var(--orange);}
+.copy-btn{
+  position:absolute; top:8px; right:8px;
+  padding:4px 12px; background:var(--bg3);
+  border:1px solid var(--muted); border-radius:4px;
+  color:var(--dim); font-size:11px; cursor:pointer;
+  transition:all .15s;
+}
+.copy-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.copy-btn.copied{border-color:var(--green);color:var(--green);}
+
+/* ─── Buttons ──────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px; border-radius:var(--r);
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s; border:none; text-decoration:none;
+}
+.btn-primary{background:var(--cyan);color:#000;}
+.btn-primary:hover{opacity:.85;}
+.btn-success{background:var(--green);color:#000;}
+.btn-success:hover{opacity:.85;}
+.btn-outline{
+  background:transparent;border:1.5px solid var(--cyan);
+  color:var(--cyan);
+}
+.btn-outline:hover{background:var(--cyan)18;}
+.btn-sm{padding:7px 14px;font-size:12px;}
+
+/* ─── Input fields ─────────────────────────────── */
+.input-group{margin:12px 0;}
+.input-group label{
+  display:block;font-size:12px;color:var(--dim);
+  letter-spacing:1px;margin-bottom:6px;font-weight:600;
+}
+.input-field{
+  width:100%;padding:10px 14px;
+  background:#050B12;border:1px solid var(--muted);
+  border-radius:var(--r);color:var(--text);
+  font-size:14px;outline:none;font-family:inherit;
+  transition:border-color .2s;
+}
+.input-field:focus{border-color:var(--cyan);}
+.input-field::placeholder{color:var(--muted);}
+
+/* ─── Checklist ────────────────────────────────── */
+.checklist{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.checklist li{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px; background:var(--bg3);
+  border-radius:var(--r); cursor:pointer;
+  border:1px solid transparent; transition:all .15s;
+}
+.checklist li:hover{border-color:var(--muted);}
+.checklist li.checked{
+  background:#00FF6612;border-color:#00FF6644;
+  text-decoration:line-through;color:var(--dim);
+}
+.check-box{
+  width:22px;height:22px;border-radius:4px;
+  border:2px solid var(--muted);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;transition:all .15s;
+}
+.checklist li.checked .check-box{
+  background:var(--green);border-color:var(--green);color:#000;
+}
+
+/* ─── Icon Generator ───────────────────────────── */
+#icon-canvas-192,#icon-canvas-512{display:none;}
+.icon-preview{
+  display:flex;gap:20px;align-items:center;
+  flex-wrap:wrap;margin-top:16px;
+}
+.icon-preview-item{text-align:center;}
+.icon-preview-item img{
+  border-radius:14px;display:block;
+  border:1px solid var(--muted);margin-bottom:6px;
+}
+.icon-preview-item p{font-size:11px;color:var(--dim);}
+.icon-dl{
+  display:inline-block;padding:5px 14px;margin-top:4px;
+  background:var(--green)22;border:1px solid var(--green);
+  border-radius:4px;color:var(--green);
+  font-size:11px;text-decoration:none;cursor:pointer;
+}
+
+/* ─── Status banner ────────────────────────────── */
+.banner{
+  padding:12px 16px;border-radius:var(--r);
+  margin:12px 0;font-size:13px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.banner-info {background:#00AEEF18;border:1px solid #00AEEF44;color:#7dd3f5;}
+.banner-warn {background:#FF8C0018;border:1px solid #FF8C0044;color:#ffc57d;}
+.banner-ok   {background:#00FF6618;border:1px solid #00FF6644;color:#6effa8;}
+
+/* ─── Table ────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+th{
+  background:var(--bg3);padding:10px 14px;
+  text-align:left;color:var(--cyan);
+  font-size:11px;letter-spacing:1px;
+  border-bottom:1px solid var(--muted);
+}
+td{padding:9px 14px;border-bottom:1px solid #ffffff08;}
+tr:last-child td{border:none;}
+.tag{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:11px;font-weight:600;
+}
+.tag-ok {background:#00FF6622;color:var(--green);}
+.tag-warn{background:#FF8C0022;color:var(--orange);}
+.tag-no {background:#FF444422;color:var(--red);}
+
+/* ─── QR Code ──────────────────────────────────── */
+#qr-container{
+  text-align:center;padding:20px;
+  background:var(--bg3);border-radius:var(--radius);
+  border:1px solid var(--muted);
+}
+#qr-img{max-width:200px;border-radius:8px;display:none;margin:0 auto 10px;}
+
+/* ─── Progress bar ─────────────────────────────── */
+.progress-wrap{
+  background:var(--bg3);border-radius:4px;height:8px;
+  margin:16px 0;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));
+  border-radius:4px;transition:width .5s;
+}
+.progress-label{font-size:12px;color:var(--dim);text-align:right;margin-top:4px;}
+
+/* ─── Misc ─────────────────────────────────────── */
+h3{font-size:15px;color:var(--cyan);letter-spacing:1px;margin:16px 0 8px;
+   font-family:monospace;text-transform:uppercase;}
+p{margin:8px 0;color:var(--dim);}
+strong{color:var(--text);}
+hr{border:none;border-top:1px solid var(--muted);margin:20px 0;}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+.pill{
+  padding:4px 12px;border-radius:20px;font-size:12px;
+  background:var(--muted)22;border:1px solid var(--muted);color:var(--dim);
+}
+.note{font-size:12px;color:var(--muted);margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ─────────────────────────────────────── -->
+<div class="hero">
+  <span class="hero-icon">🏍</span>
+  <h1>MOTODASH SETUP</h1>
+  <p>Panduan end-to-end dari download hingga install di Android</p>
+</div>
+
+<div class="container">
+
+<!-- ── PROGRESS ────────────────────────────────── -->
+<div>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+  <div class="progress-label" id="progress-label">0 / 6 selesai</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     STEP 1 — PRASYARAT
+     ═══════════════════════════════════════════════ -->
+<div class="step active" id="step1">
+  <div class="step-header" onclick="toggleStep('step1')">
+    <div class="step-num">1</div>
+    <div class="step-title">📋 Prasyarat</div>
+    <div class="step-badge">Wajib</div>
+  </div>
+  <div class="step-body">
+    <p>Pastikan semua kebutuhan berikut sudah terpenuhi sebelum melanjutkan:</p>
+    <table>
+      <thead><tr><th>Kebutuhan</th><th>Cek</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Git</strong></td>
+            <td><span class="tag tag-ok">✓ Wajib</span></td>
+            <td>Download: <a href="https://git-scm.com" target="_blank">git-scm.com</a></td></tr>
+        <tr><td><strong>Akun GitHub</strong></td>
+            <td><span class="tag tag-ok">✓ Wajib</span></td>
+            <td>Daftar gratis: <a href="https://github.com/signup" target="_blank">github.com/signup</a></td></tr>
+        <tr><td><strong>Browser Android</strong></td>
+            <td><span class="tag tag-ok">✓ Chrome</span></td>
+            <td>Chrome Android (untuk BT, Voice, PWA install)</td></tr>
+        <tr><td><strong>File MotoDash</strong></td>
+            <td><span class="tag tag-ok">✓ ZIP</span></td>
+            <td>Download dari Claude (motodash.zip)</td></tr>
+      </tbody>
+    </table>
+    <hr>
+    <h3>Cek Git Sudah Terinstall</h3>
+    <div class="code-block">
+      <pre>git --version</pre>
+      <button class="copy-btn" onclick="copyCode(this,'git --version')">Copy</button>
+    </div>
+    <p>Jika berhasil akan muncul: <code style="color:var(--green)">git version 2.x.x</code></p>
+
+    <hr>
+    <h3>✅ Checklist Step 1</h3>
+    <ul class="checklist" id="check1">
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Git sudah terinstall di komputer</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Punya akun GitHub (sudah login)</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>File motodash.zip sudah didownload</li>
+    </ul>
+    <br>
+    <button class="btn btn-primary" onclick="markStepDone('step1',1)">Lanjut ke Step 2 →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 2 — GENERATE ICONS
+     ═══════════════════════════════════════════════ -->
+<div class="step" id="step2">
+  <div class="step-header" onclick="toggleStep('step2')">
+    <div class="step-num">2</div>
+    <div class="step-title">🎨 Generate Icon PNG</div>
+    <div class="step-badge">Wajib untuk Install</div>
+  </div>
+  <div class="step-body">
+    <div class="banner banner-warn">
+      ⚠️ <strong>Penting:</strong> PWA wajib memiliki file <code>icon-192.png</code> dan
+      <code>icon-512.png</code> agar bisa di-install di Android.
+    </div>
+    <p>Klik tombol di bawah untuk generate icon otomatis dari file SVG:</p>
+
+    <!-- Hidden canvases for rendering -->
+    <canvas id="icon-canvas-192" width="192" height="192"></canvas>
+    <canvas id="icon-canvas-512" width="512" height="512"></canvas>
+
+    <br>
+    <button class="btn btn-primary" onclick="generateIcons()" id="gen-btn">
+      🎨 Generate Icons Sekarang
+    </button>
+
+    <div id="icon-output" class="icon-preview" style="display:none"></div>
+
+    <hr>
+    <h3>Setelah Download:</h3>
+    <ol style="padding-left:20px;color:var(--dim);line-height:2">
+      <li>Download kedua file PNG dari tombol di atas</li>
+      <li>Buka folder <code>motodash/assets/icons/</code></li>
+      <li>Taruh <code>icon-192.png</code> dan <code>icon-512.png</code> di sana</li>
+      <li>Lanjut ke Step 3</li>
+    </ol>
+    <br>
+    <button class="btn btn-primary" onclick="markStepDone('step2',2)">Lanjut ke Step 3 →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 3 — EXTRACT DAN SETUP LOCAL
+     ═══════════════════════════════════════════════ -->
+<div class="step" id="step3">
+  <div class="step-header" onclick="toggleStep('step3')">
+    <div class="step-num">3</div>
+    <div class="step-title">📁 Setup Project Lokal</div>
+    <div class="step-badge">~5 menit</div>
+  </div>
+  <div class="step-body">
+
+    <h3>Langkah-Langkah:</h3>
+
+    <p><strong>① Extract file ZIP</strong></p>
+    <p>Extract <code>motodash.zip</code> ke folder pilihan Anda. Hasilnya:</p>
+    <div class="code-block">
+      <pre>motodash/
+├── index.html
+├── manifest.json
+├── sw.js
+├── css/style.css
+├── js/(8 file JS)
+├── assets/icons/
+│   ├── icon.svg
+│   ├── icon-192.png  ← dari Step 2
+│   └── icon-512.png  ← dari Step 2
+├── .github/workflows/deploy.yml
+├── .nojekyll
+└── README.md</pre>
+    </div>
+
+    <hr>
+    <p><strong>② Tes di lokal dulu (opsional tapi disarankan)</strong></p>
+    <div class="code-block">
+      <pre>cd motodash
+python3 -m http.server 8080</pre>
+      <button class="copy-btn" onclick="copyCode(this,'cd motodash\npython3 -m http.server 8080')">Copy</button>
+    </div>
+    <p>Buka browser: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
+    <div class="banner banner-info">
+      💡 Harus pakai local server (bukan buka file HTML langsung) agar GPS & PWA features bekerja.
+    </div>
+
+    <hr>
+    <p><strong>③ Init Git di folder project</strong></p>
+    <div class="code-block">
+      <pre>cd motodash
+git init
+git add .
+git commit -m "feat: MotoDash v1.0.0 initial commit"</pre>
+      <button class="copy-btn" onclick="copyCode(this,'cd motodash\ngit init\ngit add .\ngit commit -m \"feat: MotoDash v1.0.0 initial commit\"')">Copy</button>
+    </div>
+
+    <ul class="checklist">
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>File ZIP sudah di-extract</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Icon PNG sudah ditaruh di assets/icons/</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Git init sudah dijalankan</li>
+    </ul>
+    <br>
+    <button class="btn btn-primary" onclick="markStepDone('step3',3)">Lanjut ke Step 4 →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 4 — BUAT GITHUB REPO & PUSH
+     ═══════════════════════════════════════════════ -->
+<div class="step" id="step4">
+  <div class="step-header" onclick="toggleStep('step4')">
+    <div class="step-num">4</div>
+    <div class="step-title">🐙 Buat GitHub Repository &amp; Push</div>
+    <div class="step-badge">~5 menit</div>
+  </div>
+  <div class="step-body">
+
+    <!-- Username input to customize commands -->
+    <div class="input-group">
+      <label>MASUKKAN GITHUB USERNAME ANDA:</label>
+      <input type="text" class="input-field" id="gh-username"
+             placeholder="contoh: johndoe" oninput="updateCommands()">
+    </div>
+
+    <hr>
+    <h3>① Buat Repository Baru di GitHub</h3>
+    <p>Klik link berikut untuk buat repo baru:</p>
+    <a class="btn btn-outline" id="new-repo-link"
+       href="https://github.com/new" target="_blank">
+      🐙 Buat Repo Baru di GitHub
+    </a>
+    <div class="banner banner-info" style="margin-top:12px">
+      📝 <strong>Pengaturan yang WAJIB:</strong><br>
+      • Repository name: <code id="repo-name-display">motodash</code><br>
+      • Visibility: <strong>Public</strong> (GitHub Pages gratis hanya untuk public)<br>
+      • ❌ JANGAN centang "Add README" atau "Add .gitignore"
+    </div>
+
+    <hr>
+    <h3>② Push Code ke GitHub</h3>
+    <p>Copy dan jalankan perintah ini di terminal (ganti username jika belum diisi di atas):</p>
+
+    <div class="code-block">
+      <pre id="cmd-remote">git remote add origin https://github.com/<span class="cmd-var">USERNAME</span>/motodash.git
+git branch -M main
+git push -u origin main</pre>
+      <button class="copy-btn" onclick="copyEl(this,'cmd-remote')">Copy</button>
+    </div>
+
+    <div class="banner banner-warn">
+      🔐 GitHub mungkin meminta login. Gunakan <strong>Personal Access Token</strong> sebagai password.
+      Buat di: <a href="https://github.com/settings/tokens" target="_blank">Settings → Developer settings → Tokens</a>
+    </div>
+
+    <hr>
+    <h3>③ Verifikasi Push Berhasil</h3>
+    <p>Buka repository Anda di browser:</p>
+    <a class="btn btn-outline btn-sm" id="repo-check-link"
+       href="https://github.com" target="_blank">
+      🔍 Buka Repository
+    </a>
+    <p>Jika semua file terlihat → Push berhasil! ✅</p>
+
+    <ul class="checklist">
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Repo baru sudah dibuat di GitHub</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>git push berhasil tanpa error</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>File terlihat di GitHub repository</li>
+    </ul>
+    <br>
+    <button class="btn btn-primary" onclick="markStepDone('step4',4)">Lanjut ke Step 5 →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 5 — AKTIFKAN GITHUB PAGES
+     ═══════════════════════════════════════════════ -->
+<div class="step" id="step5">
+  <div class="step-header" onclick="toggleStep('step5')">
+    <div class="step-num">5</div>
+    <div class="step-title">🌐 Aktifkan GitHub Pages</div>
+    <div class="step-badge">~2 menit</div>
+  </div>
+  <div class="step-body">
+
+    <h3>Metode A — GitHub Actions (Otomatis, Disarankan)</h3>
+    <p>Repository sudah berisi file <code>.github/workflows/deploy.yml</code>.
+       Aktifkan dengan langkah berikut:</p>
+
+    <ol style="padding-left:20px;color:var(--dim);line-height:2.2;">
+      <li>Buka repository → tab <strong>Settings</strong></li>
+      <li>Sidebar kiri → klik <strong>Pages</strong></li>
+      <li>Di bagian <em>"Build and deployment"</em> → Source: pilih
+          <strong>"GitHub Actions"</strong></li>
+      <li>Klik <strong>Save</strong></li>
+      <li>Kembali ke tab <strong>Actions</strong> → tunggu workflow selesai (✅ hijau)</li>
+      <li>URL live akan muncul di tab Pages</li>
+    </ol>
+
+    <div class="banner banner-ok">
+      ✅ Setelah ini, setiap kali Anda push ke <strong>main</strong>, app akan ter-deploy otomatis!
+    </div>
+
+    <hr>
+    <h3>URL Aplikasi Anda:</h3>
+    <div class="code-block">
+      <pre id="app-url">https://<span class="cmd-var">USERNAME</span>.github.io/motodash/</pre>
+      <button class="copy-btn" onclick="copyEl(this,'app-url')">Copy</button>
+    </div>
+    <a class="btn btn-success" id="open-app-btn"
+       href="https://github.com" target="_blank">
+      🚀 Buka Aplikasi
+    </a>
+
+    <hr>
+    <h3>Generate QR Code untuk Akses Cepat dari HP</h3>
+    <div class="input-group">
+      <label>MASUKKAN URL APLIKASI ANDA:</label>
+      <input type="text" class="input-field" id="qr-url-input"
+             placeholder="https://USERNAME.github.io/motodash/">
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="generateQR()">📱 Generate QR Code</button>
+    <div id="qr-container" style="display:none;margin-top:16px">
+      <img id="qr-img" alt="QR Code">
+      <p style="color:var(--dim);font-size:13px;">Scan dengan kamera HP untuk buka aplikasi</p>
+    </div>
+
+    <ul class="checklist">
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>GitHub Pages sudah diaktifkan</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>GitHub Actions workflow berhasil (✅)</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>URL aplikasi bisa diakses di browser</li>
+    </ul>
+    <br>
+    <button class="btn btn-primary" onclick="markStepDone('step5',5)">Lanjut ke Step 6 →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     STEP 6 — INSTALL PWA DI ANDROID
+     ═══════════════════════════════════════════════ -->
+<div class="step" id="step6">
+  <div class="step-header" onclick="toggleStep('step6')">
+    <div class="step-num">6</div>
+    <div class="step-title">📱 Install PWA di Android</div>
+    <div class="step-badge">Langkah Terakhir</div>
+  </div>
+  <div class="step-body">
+
+    <div class="banner banner-info">
+      📱 Gunakan <strong>Chrome Android</strong> untuk hasil terbaik.
+      Buka URL dari Step 5 di Chrome Android.
+    </div>
+
+    <h3>Cara Install (Chrome Android)</h3>
+    <ol style="padding-left:20px;color:var(--dim);line-height:2.5;font-size:14px;">
+      <li>Buka <strong>Chrome Android</strong> → navigasi ke URL aplikasi</li>
+      <li>Tunggu sampai aplikasi <strong>loading penuh</strong> (peta muncul)</li>
+      <li>Tap ikon <strong>⋮ (3 titik)</strong> di pojok kanan atas Chrome</li>
+      <li>Tap <strong>"Add to Home screen"</strong> atau <strong>"Install app"</strong></li>
+      <li>Konfirmasi nama <code>MotoDash</code> → tap <strong>Add</strong></li>
+      <li>Icon MotoDash muncul di home screen 🎉</li>
+    </ol>
+
+    <div class="banner banner-ok">
+      ✅ Setelah install, aplikasi akan berjalan <strong>fullscreen landscape</strong>
+      tanpa browser bar — persis seperti native app!
+    </div>
+
+    <hr>
+    <h3>Aktifkan Izin yang Diperlukan</h3>
+    <table>
+      <thead><tr><th>Fitur</th><th>Izin yang Dibutuhkan</th><th>Cara Aktifkan</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>🛰 GPS Speedometer</td>
+          <td><span class="tag tag-ok">Lokasi</span></td>
+          <td>Tap Allow saat popup muncul</td>
+        </tr>
+        <tr>
+          <td>🎤 Voice Assistant</td>
+          <td><span class="tag tag-ok">Mikrofon</span></td>
+          <td>Tap Allow saat tap mic pertama kali</td>
+        </tr>
+        <tr>
+          <td>📡 Bluetooth</td>
+          <td><span class="tag tag-ok">Bluetooth</span></td>
+          <td>Tap Allow saat scan device</td>
+        </tr>
+        <tr>
+          <td>🗺 Maps Offline</td>
+          <td><span class="tag tag-ok">Storage</span></td>
+          <td>Otomatis oleh Service Worker</td>
+        </tr>
+        <tr>
+          <td>💡 Screen On</td>
+          <td><span class="tag tag-ok">Wake Lock</span></td>
+          <td>Otomatis saat app dibuka</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr>
+    <h3>Tips Penggunaan di Motor</h3>
+    <ul style="padding-left:20px;color:var(--dim);line-height:2.2;">
+      <li>Mount HP di <strong>handlebar mount</strong> landscape mode</li>
+      <li>Aktifkan <strong>Brightness 100%</strong> di Settings panel</li>
+      <li>Aktifkan <strong>GPS High Accuracy</strong> sebelum berangkat</li>
+      <li>Pasang headset via <strong>Bluetooth panel</strong> untuk navigasi suara</li>
+      <li>Set destination via <strong>Search bar</strong> atau perintah suara</li>
+    </ul>
+
+    <ul class="checklist">
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Aplikasi berhasil diinstall di home screen</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>GPS speedometer menampilkan kecepatan</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Peta maps terbuka dan bisa di-zoom</li>
+      <li onclick="toggleCheck(this)"><div class="check-box"></div>Navigasi ke suatu tempat berhasil</li>
+    </ul>
+    <br>
+    <button class="btn btn-success" onclick="markStepDone('step6',6)">
+      🎉 Setup Selesai! Siap Digunakan
+    </button>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     QUICK REFERENCE
+     ═══════════════════════════════════════════════ -->
+<div style="margin-top:32px">
+  <div class="step">
+    <div class="step-header" onclick="toggleStep('ref')">
+      <div class="step-num" style="background:var(--orange);color:#000">📖</div>
+      <div class="step-title">Quick Reference — Panduan Singkat Fitur</div>
+      <div class="step-badge">Referensi</div>
+    </div>
+    <div class="step-body" id="ref-body" style="display:block">
+
+      <div class="grid2">
+
+        <!-- Voice Commands -->
+        <div>
+          <h3>🎤 Perintah Suara</h3>
+          <table>
+            <tr><td><code style="color:var(--cyan)">Navigate to [tempat]</code></td><td>Mulai navigasi</td></tr>
+            <tr><td><code style="color:var(--cyan)">Show speed</code></td><td>Ucapkan kecepatan</td></tr>
+            <tr><td><code style="color:var(--cyan)">Open maps</code></td><td>Buka panel Maps</td></tr>
+            <tr><td><code style="color:var(--cyan)">Current location</code></td><td>Centre ke posisi</td></tr>
+            <tr><td><code style="color:var(--cyan)">Zoom in/out</code></td><td>Zoom peta</td></tr>
+            <tr><td><code style="color:var(--cyan)">Stop navigation</code></td><td>Hentikan rute</td></tr>
+            <tr><td><code style="color:var(--cyan)">Play / Pause</code></td><td>Kontrol musik</td></tr>
+            <tr><td><code style="color:var(--cyan)">Next / Previous</code></td><td>Ganti lagu</td></tr>
+          </table>
+        </div>
+
+        <!-- Riding Modes -->
+        <div>
+          <h3>🏍 Riding Mode</h3>
+          <table>
+            <tr>
+              <td><span class="tag" style="background:#00FF6622;color:var(--green)">ECO</span></td>
+              <td>Filter halus, hemat GPS poll</td>
+            </tr>
+            <tr>
+              <td><span class="tag" style="background:#00AEEF22;color:var(--cyan)">NORMAL</span></td>
+              <td>Seimbang, cocok harian</td>
+            </tr>
+            <tr>
+              <td><span class="tag" style="background:#FF8C0022;color:var(--orange)">SPORT</span></td>
+              <td>Respons cepat, racing</td>
+            </tr>
+          </table>
+
+          <h3 style="margin-top:16px">📊 Trip Computer</h3>
+          <table>
+            <tr><td><strong>TRIP</strong></td><td>Jarak perjalanan (km)</td></tr>
+            <tr><td><strong>AVG</strong></td><td>Kecepatan rata-rata</td></tr>
+            <tr><td><strong>MAX</strong></td><td>Kecepatan tertinggi</td></tr>
+            <tr><td><strong>TIME</strong></td><td>Durasi perjalanan</td></tr>
+          </table>
+        </div>
+
+      </div><!-- /grid2 -->
+
+      <hr>
+      <h3>🔧 Troubleshooting Cepat</h3>
+      <table>
+        <thead><tr><th>Masalah</th><th>Solusi</th></tr></thead>
+        <tbody>
+          <tr><td>GPS tidak akurat</td>
+              <td>Buka Settings → GPS Calibration → atur offset</td></tr>
+          <tr><td>Peta tidak muncul</td>
+              <td>Cek koneksi internet, refresh halaman</td></tr>
+          <tr><td>Rute gagal dihitung</td>
+              <td>Pastikan internet aktif (OSRM butuh koneksi)</td></tr>
+          <tr><td>Voice tidak jalan</td>
+              <td>Izinkan mikrofon, gunakan Chrome/Edge</td></tr>
+          <tr><td>BT tidak connect</td>
+              <td>Harus HTTPS + Chrome Android + aktifkan BT</td></tr>
+          <tr><td>Install button tidak muncul</td>
+              <td>Pastikan icon PNG 192 &amp; 512 ada di assets/icons/</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- ─────────────────────────────────────────────────
+     JAVASCRIPT
+     ───────────────────────────────────────────────── -->
+<script>
+// ── State ──────────────────────────────────────────────
+const stepsCompleted = new Set();
+const totalSteps = 6;
+
+// ── Toggle Step Body ───────────────────────────────────
+function toggleStep(id) {
+  const el   = document.getElementById(id);
+  const body = el.querySelector('.step-body');
+  if (!body) return;
+  const visible = body.style.display !== 'none' && body.style.display !== '';
+  if (id === 'ref') {
+    body.style.display = visible ? 'none' : 'block';
+    return;
+  }
+  // For regular steps, only allow expand if not closed (handled by markStepDone)
+  body.style.display = visible ? 'none' : 'block';
+}
+
+// ── Mark Step Done ─────────────────────────────────────
+function markStepDone(id, num) {
+  const el = document.getElementById(id);
+  el.classList.add('done');
+  el.classList.remove('active');
+  el.querySelector('.step-body').style.display = 'none';
+  el.querySelector('.step-badge').textContent = '✓ Selesai';
+
+  stepsCompleted.add(num);
+  updateProgress();
+
+  // Open next step
+  const nextId = 'step' + (num + 1);
+  const next   = document.getElementById(nextId);
+  if (next) {
+    next.classList.add('active');
+    next.querySelector('.step-body').style.display = 'block';
+    next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    // All done!
+    document.querySelector('.container').insertAdjacentHTML('beforeend',
+      '<div style="text-align:center;padding:40px;background:linear-gradient(135deg,#0d1f0d,#0a0e14);border-radius:12px;margin-top:20px;border:1px solid var(--green)">' +
+      '<div style="font-size:52px">🎉</div>' +
+      '<h2 style="color:var(--green);font-size:1.8rem;letter-spacing:3px;margin:12px 0">SETUP SELESAI!</h2>' +
+      '<p style="color:var(--dim)">MotoDash siap digunakan. Selamat berkendara!</p></div>'
+    );
+  }
+}
+
+// ── Progress ───────────────────────────────────────────
+function updateProgress() {
+  const pct = Math.round((stepsCompleted.size / totalSteps) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent =
+    stepsCompleted.size + ' / ' + totalSteps + ' selesai (' + pct + '%)';
+}
+
+// ── Checklist ──────────────────────────────────────────
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const box = el.querySelector('.check-box');
+  box.textContent = el.classList.contains('checked') ? '✓' : '';
+}
+
+// ── Copy Code ──────────────────────────────────────────
+function copyCode(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyEl(btn, elId) {
+  const el   = document.getElementById(elId);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── Update Commands with Username ─────────────────────
+function updateCommands() {
+  const user = document.getElementById('gh-username').value.trim() || 'USERNAME';
+  const repo = 'motodash';
+
+  // Update remote command
+  document.getElementById('cmd-remote').innerHTML =
+    `git remote add origin https://github.com/<span class="cmd-var">${user}</span>/${repo}.git\n` +
+    `git branch -M main\n` +
+    `git push -u origin main`;
+
+  // Update app URL
+  document.getElementById('app-url').innerHTML =
+    `https://<span class="cmd-var">${user}</span>.github.io/${repo}/`;
+
+  // Update links
+  const repoUrl = `https://github.com/${user}/${repo}`;
+  const appUrl  = `https://${user}.github.io/${repo}/`;
+
+  document.getElementById('new-repo-link').href =
+    `https://github.com/new?name=${repo}&visibility=public`;
+  document.getElementById('repo-check-link').href = repoUrl;
+  document.getElementById('open-app-btn').href = appUrl;
+
+  // Pre-fill QR input
+  document.getElementById('qr-url-input').value = appUrl;
+
+  // Update repo name display
+  document.getElementById('repo-name-display').textContent = repo;
+}
+
+// ── QR Code Generator ──────────────────────────────────
+function generateQR() {
+  const url = document.getElementById('qr-url-input').value.trim();
+  if (!url) { alert('Masukkan URL terlebih dahulu'); return; }
+
+  // Use QR Server API (free, no key)
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&bgcolor=111820&color=00AEEF`;
+
+  const img = document.getElementById('qr-img');
+  img.src   = qrUrl;
+  img.style.display = 'block';
+  document.getElementById('qr-container').style.display = 'block';
+}
+
+// ── Icon Generator ─────────────────────────────────────
+async function generateIcons() {
+  const btn = document.getElementById('gen-btn');
+  btn.textContent = '⏳ Generating…';
+  btn.disabled    = true;
+
+  // SVG content for the icon (embedded, no fetch needed)
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#050505"/>
+  <circle cx="256" cy="240" r="185" fill="none" stroke="#00AEEF" stroke-width="4" opacity="0.15"/>
+  <circle cx="256" cy="240" r="160" fill="none" stroke="#0a2030" stroke-width="24"
+          stroke-dasharray="703 44" stroke-dashoffset="-22" stroke-linecap="round"/>
+  <circle cx="256" cy="240" r="160" fill="none" stroke="#00AEEF" stroke-width="24"
+          stroke-dasharray="500 247" stroke-dashoffset="-22" stroke-linecap="round"/>
+  <circle cx="256" cy="240" r="130" fill="none" stroke="#00AEEF" stroke-width="1.5" opacity="0.2"/>
+  <circle cx="256" cy="240" r="18" fill="#00AEEF" opacity="0.9"/>
+  <circle cx="256" cy="240" r="10" fill="#ffffff"/>
+  <line x1="256" y1="240" x2="370" y2="130" stroke="#00AEEF" stroke-width="6" stroke-linecap="round"/>
+  <line x1="256" y1="85"  x2="256" y2="100" stroke="#00AEEF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="370" y1="130" x2="381" y2="119" stroke="#00AEEF" stroke-width="3" stroke-linecap="round"/>
+  <line x1="411" y1="240" x2="426" y2="240" stroke="#00AEEF" stroke-width="3" stroke-linecap="round"/>
+  <text x="256" y="230" text-anchor="middle" fill="white" font-size="52" font-weight="900"
+        font-family="Arial Black,sans-serif" letter-spacing="-2">MD</text>
+  <text x="256" y="268" text-anchor="middle" fill="#00AEEF" font-size="18"
+        font-family="Arial,sans-serif" letter-spacing="5">km/h</text>
+  <rect x="100" y="430" width="312" height="3" rx="2" fill="#00AEEF" opacity="0.4"/>
+  <text x="256" y="472" text-anchor="middle" fill="white" font-size="28" font-weight="900"
+        font-family="Arial Black,sans-serif" letter-spacing="8" opacity="0.85">MOTODASH</text>
+</svg>`;
+
+  const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+  const url  = URL.createObjectURL(blob);
+  const img  = new Image();
+
+  img.onload = () => {
+    const output = document.getElementById('icon-output');
+    output.innerHTML = '';
+    output.style.display = 'flex';
+
+    [192, 512].forEach(sz => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = sz;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, sz, sz);
+      const pngUrl = canvas.toDataURL('image/png');
+      const fname  = `icon-${sz}.png`;
+
+      const div = document.createElement('div');
+      div.className = 'icon-preview-item';
+      div.innerHTML = `
+        <img src="${pngUrl}" width="${sz > 192 ? 128 : 96}" height="${sz > 192 ? 128 : 96}">
+        <p>${sz} × ${sz} px</p>
+        <a class="icon-dl" href="${pngUrl}" download="${fname}">⬇ ${fname}</a>`;
+      output.appendChild(div);
+    });
+
+    URL.revokeObjectURL(url);
+    btn.textContent = '✅ Icons Generated!';
+    btn.style.background = 'var(--green)';
+  };
+
+  img.onerror = () => {
+    btn.textContent = '❌ Error — coba lagi';
+    btn.disabled = false;
+  };
+
+  img.src = url;
+}
+</script>
+</body>
+</html>

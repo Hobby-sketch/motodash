@@ -1,0 +1,51 @@
+# MotoDash — GitHub Pages Auto Deployment
+# Runs on every push to main branch
+
+name: 🏍 Deploy MotoDash
+
+on:
+  push:
+    branches: ["main"]
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+# Grant permissions to deploy to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment runs at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configure GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: 📦 Upload site files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Deploy everything from root (excludes .github automatically)
+          path: "."
+
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: ✅ Print live URL
+        run: |
+          echo "MotoDash deployed successfully!"
+          echo "🌐 Live URL: ${{ steps.deployment.outputs.page_url }}"

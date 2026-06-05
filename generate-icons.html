@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MotoDash — Generate PWA Icons</title>
+  <style>
+    body { font-family: sans-serif; padding: 30px; background: #111; color: #eee; }
+    h2   { color: #00AEEF; }
+    p    { color: #aaa; margin: 8px 0; }
+    a    { color: #00FF66; }
+    .btn {
+      display: inline-block; margin-top: 20px; padding: 12px 28px;
+      background: #00AEEF; color: #000; border-radius: 8px;
+      font-weight: 700; cursor: pointer; border: none; font-size: 14px;
+    }
+    canvas { display: none; }
+    .icon-preview { margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap; }
+    .icon-item { text-align: center; }
+    .icon-item img { border-radius: 12px; display: block; border: 1px solid #333; }
+    .icon-item p { font-size: 12px; color: #888; }
+    .dl-link { color: #00FF66; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h2>🏍 MotoDash — PWA Icon Generator</h2>
+  <p>This tool generates the required PNG icons from the SVG for PWA installation on Android Chrome.</p>
+  <p>After generating, save <strong>icon-192.png</strong> and <strong>icon-512.png</strong> into <code>assets/icons/</code></p>
+
+  <button class="btn" onclick="generate()">Generate PNG Icons</button>
+
+  <canvas id="c192" width="192" height="192"></canvas>
+  <canvas id="c512" width="512" height="512"></canvas>
+
+  <div class="icon-preview" id="preview"></div>
+
+  <script>
+    const SVG_URL = 'assets/icons/icon.svg';
+
+    async function generate() {
+      const preview = document.getElementById('preview');
+      preview.innerHTML = '<p style="color:#aaa">Generating…</p>';
+
+      const svgText = await fetch(SVG_URL).then(r => r.text());
+      const blob    = new Blob([svgText], { type: 'image/svg+xml' });
+      const url     = URL.createObjectURL(blob);
+      const img     = new Image();
+
+      img.onload = () => {
+        const sizes = [192, 512];
+        const links = [];
+
+        sizes.forEach(sz => {
+          const canvas = document.createElement('canvas');
+          canvas.width = canvas.height = sz;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, sz, sz);
+
+          const pngUrl  = canvas.toDataURL('image/png');
+          const filename = `icon-${sz}.png`;
+          links.push({ sz, pngUrl, filename });
+        });
+
+        URL.revokeObjectURL(url);
+        preview.innerHTML = '';
+
+        links.forEach(({ sz, pngUrl, filename }) => {
+          const div = document.createElement('div');
+          div.className = 'icon-item';
+          div.innerHTML = `
+            <img src="${pngUrl}" width="${sz > 192 ? 128 : sz}" height="${sz > 192 ? 128 : sz}" alt="${filename}">
+            <p>${sz}×${sz}</p>
+            <a class="dl-link" href="${pngUrl}" download="${filename}">⬇ Download ${filename}</a>
+          `;
+          preview.appendChild(div);
+        });
+
+        const note = document.createElement('div');
+        note.style.cssText = 'width:100%;color:#888;font-size:12px;margin-top:10px;';
+        note.textContent   = 'Save both files into assets/icons/ then deploy.';
+        preview.appendChild(note);
+      };
+
+      img.onerror = () => {
+        preview.innerHTML = '<p style="color:#FF4444">Could not load icon.svg — run this from a local server or GitHub Pages.</p>';
+      };
+
+      img.src = url;
+    }
+  </script>
+</body>
+</html>
