@@ -274,6 +274,20 @@ class MapsModule {
     //  ROUTING  (Leaflet Routing Machine + OSRM)
     // ─────────────────────────────────────────────────────
     _startNavigation(fromLat, fromLng, toLat, toLng, destName) {
+        /*
+         * DEFENSIVE CHECK: L.Routing comes from leaflet-routing-machine.js
+         * (a separate CDN script). If that file failed to load — network
+         * issue, CDN outage, blocked script — calling L.Routing.control()
+         * would throw "Cannot read properties of undefined". Catch this
+         * early with a clear message instead of a silent crash.
+         */
+        if (typeof L.Routing === 'undefined') {
+            console.error('[Maps] FATAL: L.Routing is not defined. leaflet-routing-machine.js failed to load.');
+            Utils.showToast('Fitur navigasi gagal dimuat — coba refresh halaman', 'error', 5000);
+            this.isNavigating = false;
+            return;
+        }
+
         /* Remove old route */
         if (this.routeControl) {
             this.map.removeControl(this.routeControl);
@@ -494,6 +508,37 @@ class MapsModule {
 document.addEventListener('DOMContentLoaded', () => {
     /* Small delay — ensures the map <div> is painted */
     setTimeout(() => {
+        /*
+         * DEFENSIVE CHECK: If the Leaflet library (global `L`) failed to
+         * load — e.g. CDN is down, blocked by network/firewall, ad-blocker,
+         * or a corrupted SRI integrity hash — show a clear, visible error
+         * instead of silently failing with a blank map and a console-only
+         * error. This makes future CDN issues immediately diagnosable.
+         */
+        if (typeof L === 'undefined') {
+            const mapEl = document.getElementById('map');
+            if (mapEl) {
+                mapEl.innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;
+                                justify-content:center;height:100%;padding:24px;
+                                text-align:center;color:#FF4444;font-family:sans-serif;">
+                        <div style="font-size:40px;margin-bottom:12px;">⚠️</div>
+                        <div style="font-size:15px;font-weight:600;margin-bottom:8px;">
+                            Peta gagal dimuat
+                        </div>
+                        <div style="font-size:13px;color:#7A9BB5;max-width:320px;line-height:1.6;">
+                            Library Leaflet tidak berhasil di-load dari CDN.
+                            Cek koneksi internet, matikan ad-blocker, atau coba
+                            refresh halaman. Jika masalah berlanjut, buka
+                            Console (F12) untuk detail error.
+                        </div>
+                    </div>`;
+            }
+            console.error('[Maps] FATAL: Leaflet (L) is not defined. CDN script failed to load.');
+            Utils.showToast?.('Peta gagal dimuat — cek koneksi internet', 'error', 6000);
+            return; // Do not attempt to construct MapsModule — it will throw
+        }
+
         window.mapsModule = new MapsModule();
         console.log('[Maps] Ready ✓');
     }, 150);
