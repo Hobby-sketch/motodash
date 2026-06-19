@@ -60,9 +60,18 @@ class MotoDash {
         const target = document.getElementById(`panel-${name}`);
         if (target) target.classList.add('active');
 
-        /* Leaflet needs invalidateSize when its container becomes visible */
-        if (name === 'maps' && window.mapsModule?.map) {
-            setTimeout(() => window.mapsModule.map.invalidateSize(), 60);
+        /*
+         * FIX: Leaflet needs invalidateSize() every time its container
+         * becomes visible. Use 300ms delay to cover both:
+         * (a) the 150ms MapsModule init delay on first load
+         * (b) CSS fade-slide animation on subsequent switches
+         */
+        if (name === 'maps') {
+            setTimeout(() => {
+                if (window.mapsModule?.map) {
+                    window.mapsModule.map.invalidateSize();
+                }
+            }, 300);
         }
     }
 
@@ -232,11 +241,8 @@ class MotoDash {
         document.getElementById('export-gpx-btn')
             ?.addEventListener('click', () => window.tripComputer?.exportGPX());
 
-        /* GPS Calibration (bound in speedometer.js, but stop-btn here too) */
-        document.getElementById('save-calibration')
-            ?.addEventListener('click', () => window.speedometer?.saveCalibration());
-        document.getElementById('reset-calibration')
-            ?.addEventListener('click', () => window.speedometer?.resetCalibration());
+        /* NOTE: save-calibration & reset-calibration are bound in speedometer.js._setupUI()
+         * Do NOT add listeners here — would cause double-firing. */
     }
 
     // ─────────────────────────────────────────────────────

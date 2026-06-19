@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MotoDash — Panduan Lengkap</title>
+<style>
+:root {
+  --bg:#07101A; --card:#0D1B2A; --card2:#111F30;
+  --border:#1A3048; --muted:#2A4060;
+  --cyan:#00AEEF; --green:#00E676; --orange:#FF9800;
+  --red:#FF5252; --yellow:#FFD740;
+  --text:#E8F4FD; --dim:#7A9BB5; --faint:#3A5068;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg); color:var(--text);
+  font-size:15px; line-height:1.7;
+}
+
+/* ── Layout ── */
+.wrap{max-width:760px;margin:0 auto;padding:0 18px 80px;}
+
+/* ── Hero ── */
+.hero{
+  text-align:center;
+  padding:44px 20px 36px;
+  background:linear-gradient(180deg,#091829 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+}
+.logo{
+  font-size:2.6rem;font-weight:900;letter-spacing:7px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;display:block;margin-bottom:6px;
+}
+.hero-sub{color:var(--dim);font-size:.9rem;}
+
+/* ── Phase header ── */
+.phase{
+  margin:36px 0 10px;
+  display:flex;align-items:center;gap:12px;
+}
+.phase-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.phase-label{
+  font-size:.72rem;font-weight:700;letter-spacing:3px;
+  font-family:monospace;text-transform:uppercase;
+}
+
+/* ── Step card ── */
+.step{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:12px;overflow:hidden;
+}
+.step-head{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;background:rgba(0,0,0,.22);
+  border-bottom:1px solid var(--border);
+}
+.num{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;
+}
+.step-head h3{font-size:.95rem;font-weight:700;}
+.step-body{padding:16px 18px;}
+
+/* ── Sub rows ── */
+.row{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.row:last-child{border:none;padding-bottom:0;}
+.rn{
+  min-width:26px;height:26px;border-radius:50%;
+  background:var(--muted);color:var(--dim);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;
+}
+.rb{flex:1;}
+.rb b{display:block;color:var(--text);margin-bottom:3px;}
+.rb p{color:var(--dim);font-size:13.5px;margin:0;}
+
+/* ── Code block ── */
+.code{
+  position:relative;
+  background:#020A14;border:1px solid var(--muted);
+  border-radius:6px;padding:11px 14px;margin:8px 0;
+  font-family:'Cascadia Code','Fira Code',Consolas,monospace;
+  font-size:13px;color:#90CAF9;
+  overflow-x:auto;white-space:pre;line-height:1.7;
+}
+.code .c{color:#2E5A7A;}
+.code .hi{color:var(--orange);}
+.cbtn{
+  position:absolute;top:8px;right:8px;
+  padding:3px 11px;background:var(--muted);
+  border:1px solid var(--faint);border-radius:4px;
+  color:var(--dim);font-size:11px;cursor:pointer;
+  font-family:inherit;transition:all .15s;
+}
+.cbtn:hover{color:var(--cyan);border-color:var(--cyan);}
+.cbtn.ok{color:var(--green);border-color:var(--green);}
+
+/* ── Alerts ── */
+.alert{
+  display:flex;gap:10px;padding:11px 14px;
+  border-radius:6px;margin:10px 0;font-size:13.5px;
+}
+.ai{font-size:17px;flex-shrink:0;margin-top:1px;}
+.info  {background:rgba(0,174,239,.08);border:1px solid rgba(0,174,239,.25);}
+.warn  {background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.25);}
+.ok    {background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.22);}
+.danger{background:rgba(255,82,82,.08);border:1px solid rgba(255,82,82,.25);}
+.info   p,.info   li{color:#7dd3f5;margin:0;}
+.warn   p,.warn   li{color:#ffcc80;margin:0;}
+.ok     p,.ok     li{color:#a5d6a7;margin:0;}
+.danger p,.danger li{color:#ef9a9a;margin:0;}
+
+/* ── Table ── */
+.tw{overflow-x:auto;margin:10px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:rgba(0,0,0,.3);padding:9px 12px;text-align:left;
+   color:var(--cyan);font-size:10px;letter-spacing:1px;
+   border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--dim);}
+tr:last-child td{border:none;}
+
+/* ── Tag ── */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
+.tok{background:rgba(0,230,118,.15);color:var(--green);}
+.twn{background:rgba(255,152,0,.15);color:var(--orange);}
+
+/* ── Grid ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0;}
+@media(max-width:520px){.g2{grid-template-columns:1fr;}}
+
+/* ── Mini card ── */
+.mini{
+  background:rgba(0,0,0,.2);border:1px solid var(--border);
+  border-radius:8px;padding:13px 14px;
+}
+.mini h4{font-size:.85rem;margin-bottom:5px;}
+.mini p{font-size:12.5px;color:var(--dim);margin:0;line-height:1.6;}
+
+/* ── Voice command ── */
+.cmd{
+  border-left:3px solid var(--cyan);background:rgba(0,0,0,.2);
+  padding:8px 12px;margin:5px 0;border-radius:0 6px 6px 0;
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+}
+.cmd code{color:var(--cyan);font-size:13px;}
+.cmd span{font-size:12px;color:var(--dim);}
+
+/* ── File tree ── */
+.ftree{
+  background:#020A14;border:1px solid var(--muted);
+  border-radius:8px;padding:14px 18px;margin:10px 0;
+  font-family:monospace;font-size:13px;line-height:2;
+  overflow-x:auto;
+}
+.fd{color:var(--cyan);font-weight:700;}
+.ff{color:#A8D8EA;}
+.fn{color:#2A4060;font-size:11px;}
+.fo{color:var(--orange);}
+.fok{color:var(--green);}
+
+/* ── Highlight box ── */
+.hbox{
+  background:rgba(0,174,239,.06);
+  border:1px solid rgba(0,174,239,.3);
+  border-radius:8px;padding:14px 16px;margin:12px 0;
+}
+.hbox h4{color:var(--cyan);font-size:.85rem;margin-bottom:6px;letter-spacing:1px;}
+.hbox p{color:#7dd3f5;font-size:13.5px;margin:0;line-height:1.6;}
+
+/* ── Footer & back-to-top ── */
+.foot{text-align:center;color:var(--muted);font-size:12px;padding:28px 0;}
+.btt{
+  position:fixed;bottom:20px;right:20px;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--cyan);color:#000;border:none;
+  font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,174,239,.4);
+  transition:transform .2s;z-index:99;
+}
+.btt:hover{transform:translateY(-2px);}
+
+/* ── Separator ── */
+hr.sep{border:none;border-top:1px solid var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="logo">MOTODASH</span>
+  <p class="hero-sub">Panduan Lengkap dari Awal sampai Jalan — untuk Pemula</p>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════
+  DAFTAR ISI
+══════════════════════════════════════ -->
+<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:24px 0;">
+  <p style="font-family:monospace;font-size:.72rem;letter-spacing:3px;color:var(--cyan);margin-bottom:12px;">DAFTAR ISI</p>
+  <div class="g2" style="gap:4px 24px;">
+    <a href="#a1" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">A1 · Extract file</a>
+    <a href="#b1" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">B1 · Buat akun GitHub</a>
+    <a href="#a2" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">A2 · Generate icon PNG</a>
+    <a href="#b2" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">B2 · Buat token GitHub</a>
+    <a href="#a3" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">A3 · Install Git</a>
+    <a href="#b3" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">B3 · Setup identitas Git</a>
+    <a href="#b4" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">B4 · Upload kode</a>
+    <a href="#c1" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">C1 · Aktifkan GitHub Pages</a>
+    <a href="#c2" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">C2 · Install di Android</a>
+    <a href="#d" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">D · Cara pakai fitur</a>
+    <a href="#e" style="color:var(--dim);font-size:.9rem;padding:3px 0;display:block;">E · Masalah & solusi</a>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  FASE A — PERSIAPAN
+══════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-dot" style="background:var(--orange)"></div>
+  <div class="phase-label" style="color:var(--orange)">Fase A — Persiapan di Komputer</div>
+</div>
+
+
+<!-- A1 Extract -->
+<div class="step" id="a1">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,152,0,.2);border:2px solid var(--orange);color:var(--orange)">A1</div>
+    <h3>Extract File MotoDash</h3>
+  </div>
+  <div class="step-body">
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Download motodash_final.zip dari Claude</b>
+        <p>Simpan di tempat mudah, contoh: <code>C:\</code> atau Desktop</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Klik kanan file ZIP → "Extract All..."</b>
+        <p>Pilih lokasi extract: disarankan <code>C:\motodash\</code><br>
+        (hindari path dengan spasi, contoh jangan di "My Documents")</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Pastikan isi folder sudah benar</b>
+        <div class="ftree">
+<span class="fd">motodash\</span>
+├── <span class="ff">index.html</span>            <span class="fn">← aplikasi utama</span>
+├── <span class="ff">manifest.json</span>
+├── <span class="ff">sw.js</span>
+├── <span class="fok">generate-icons.html</span>   <span class="fn">← ⬅ akan dipakai di step A2</span>
+├── <span class="ff">CARA_PAKAI.html</span>       <span class="fn">← panduan ini</span>
+├── <span class="fd">css\</span>  <span class="fd">js\</span>  <span class="fd">assets\</span>
+└── <span class="fd">.github\workflows\</span>deploy.yml</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- A2 Generate Icon -->
+<div class="step" id="a2">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,152,0,.2);border:2px solid var(--orange);color:var(--orange)">A2</div>
+    <h3>Generate Icon PNG — Cukup Double-Click!</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="hbox">
+      <h4>✨ VERSI TERBARU — Tidak perlu Python, tidak perlu server</h4>
+      <p>File <code>generate-icons.html</code> sudah bisa langsung dibuka dengan double-click. Icon dibuat langsung di browser, tidak perlu koneksi internet apapun.</p>
+    </div>
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Masuk ke folder motodash di File Explorer</b>
+        <p>Cari dan buka folder <code>C:\motodash\</code> (atau lokasi extract tadi)</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Double-click file <code>generate-icons.html</code></b>
+        <p>Browser Chrome/Edge akan terbuka otomatis menampilkan halaman generator</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Klik tombol "🎨 Generate Icon Sekarang"</b>
+        <p>Dua preview icon MotoDash akan muncul dalam 1–2 detik</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">4</div>
+      <div class="rb">
+        <b>Klik download kedua file:</b>
+        <p>⬇ <strong>icon-192.png</strong><br>⬇ <strong>icon-512.png</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">5</div>
+      <div class="rb">
+        <b>Pindahkan kedua file PNG ke folder yang benar:</b>
+        <div class="code">C:\motodash\assets\icons\</div>
+        <p>Setelah dipindah, folder <code>assets\icons\</code> berisi 3 file:</p>
+        <div class="code">icon.svg       ← sudah ada dari awal
+icon-192.png   ← baru dipindahkan ✅
+icon-512.png   ← baru dipindahkan ✅</div>
+      </div>
+    </div>
+
+    <div class="alert warn">
+      <span class="ai">⚠️</span>
+      <p>Jika browser memblokir download (muncul popup "blocked") → klik kanan gambar icon → Save image as → simpan manual ke folder <code>assets\icons\</code></p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- A3 Install Git -->
+<div class="step" id="a3">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,152,0,.2);border:2px solid var(--orange);color:var(--orange)">A3</div>
+    <h3>Install Git (jika belum ada)</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Cek apakah Git sudah terinstall</b>
+        <p>Tekan tombol <strong>Windows</strong> di keyboard → ketik <code>cmd</code> → Enter → Command Prompt terbuka. Ketik:</p>
+        <div class="code" id="cg1">git --version<button class="cbtn" onclick="cp('cg1')">Copy</button></div>
+        <p>Jika muncul <code>git version 2.x.x</code> → Git sudah ada, <strong>lewati ke Fase B</strong>.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Jika Git belum ada, download dari:</b>
+        <p><strong>git-scm.com/download/win</strong> → download installer → jalankan → klik Next terus sampai selesai (semua pengaturan biarkan default)</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Setelah install, tutup dan buka ulang Command Prompt</b>
+        <p>Verifikasi lagi dengan <code>git --version</code> → harus muncul versinya ✅</p>
+      </div>
+    </div>
+
+    <div class="alert info">
+      <span class="ai">ℹ️</span>
+      <p>Semua perintah Git di tutorial ini dijalankan di <strong>Command Prompt (cmd)</strong> — bukan Git Bash, bukan PowerShell. Keduanya bisa, tapi cmd paling sederhana untuk pemula.</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  FASE B — GITHUB
+══════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-dot" style="background:var(--cyan)"></div>
+  <div class="phase-label" style="color:var(--cyan)">Fase B — GitHub</div>
+</div>
+
+
+<!-- B1 Buat Akun & Repo -->
+<div class="step" id="b1">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,174,239,.2);border:2px solid var(--cyan);color:var(--cyan)">B1</div>
+    <h3>Buat Akun &amp; Repository GitHub</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Daftar akun GitHub (gratis)</b>
+        <p>Buka browser → pergi ke <strong>github.com/signup</strong><br>
+        Isi: email, password, username → verifikasi email yang dikirim</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Buat repository baru</b>
+        <p>Login GitHub → klik tombol <strong>+</strong> di pojok kanan atas → <strong>New repository</strong><br>
+        Atau langsung ke: <strong>github.com/new</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Isi form seperti ini:</b>
+        <div class="tw">
+          <table>
+            <tr><td><strong>Repository name</strong></td><td><code>motodash</code></td></tr>
+            <tr><td><strong>Visibility</strong></td><td>✅ <strong>Public</strong> — wajib Public untuk GitHub Pages gratis</td></tr>
+            <tr><td><strong>Initialize README</strong></td><td>❌ Jangan dicentang</td></tr>
+            <tr><td><strong>Add .gitignore</strong></td><td>❌ Jangan dicentang</td></tr>
+          </table>
+        </div>
+        <p style="margin-top:8px">→ Klik tombol hijau <strong>Create repository</strong></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- B2 Token -->
+<div class="step" id="b2">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,174,239,.2);border:2px solid var(--cyan);color:var(--cyan)">B2</div>
+    <h3>Buat Personal Access Token</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="alert info">
+      <span class="ai">ℹ️</span>
+      <p>GitHub tidak menerima password biasa untuk upload kode lewat terminal. Anda perlu membuat "token" khusus sebagai pengganti password.</p>
+    </div>
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Buka halaman token GitHub:</b>
+        <p>Di GitHub → klik foto profil (kanan atas) → <strong>Settings</strong><br>
+        Scroll sidebar kiri ke paling bawah → <strong>Developer settings</strong><br>
+        → <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong><br>
+        → <strong>Generate new token (classic)</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Isi form token:</b>
+        <div class="tw">
+          <table>
+            <tr><td><strong>Note</strong></td><td>Ketik: <code>motodash-deploy</code></td></tr>
+            <tr><td><strong>Expiration</strong></td><td>Pilih: <strong>No expiration</strong></td></tr>
+            <tr><td><strong>Select scopes</strong></td><td>✅ Centang <strong>repo</strong> (paling atas)</td></tr>
+          </table>
+        </div>
+        <p style="margin-top:8px">→ Scroll ke bawah → klik <strong>Generate token</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>COPY TOKEN SEKARANG — hanya tampil sekali!</b>
+        <p>Token akan muncul berwarna hijau/kuning. Klik ikon copy di sebelahnya. Simpan di Notepad. <strong>Jika halaman ditutup, token tidak bisa dilihat lagi dan harus buat ulang.</strong></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- B3 Setup Git -->
+<div class="step" id="b3">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,174,239,.2);border:2px solid var(--cyan);color:var(--cyan)">B3</div>
+    <h3>Setup Identitas Git (Sekali Saja)</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Buka Command Prompt baru</b>
+        <p>Tekan <strong>Windows</strong> → ketik <code>cmd</code> → Enter</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Ketik perintah ini — ganti dengan nama Anda:</b>
+        <div class="code" id="cname">git config --global user.name <span class="hi">"Nama Anda"</span><button class="cbtn" onclick="cp('cname')">Copy</button></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Ketik perintah ini — ganti dengan email GitHub Anda:</b>
+        <div class="code" id="cemail">git config --global user.email <span class="hi">"email@anda.com"</span><button class="cbtn" onclick="cp('cemail')">Copy</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- B4 Upload -->
+<div class="step" id="b4">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,174,239,.2);border:2px solid var(--cyan);color:var(--cyan)">B4</div>
+    <h3>Upload Kode ke GitHub</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Buka Command Prompt DI DALAM folder motodash</b>
+        <p>Cara paling mudah:</p>
+        <p>1. Buka <strong>File Explorer</strong><br>
+        2. Masuk ke folder <code>C:\motodash\</code><br>
+        3. Klik kotak alamat (address bar) di atas — kotak yang biasanya menampilkan path<br>
+        4. Hapus teksnya, ketik <code>cmd</code>, tekan Enter<br>
+        5. Command Prompt terbuka langsung di dalam folder motodash ✅</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Pastikan sudah di folder yang benar</b>
+        <div class="code" id="cpwd">cd<button class="cbtn" onclick="cp('cpwd')">Copy</button></div>
+        <p>Hasilnya harus menampilkan path yang berakhir dengan <code>\motodash</code></p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Jalankan 6 perintah ini — satu per satu, tekan Enter tiap selesai:</b>
+
+        <p style="margin-top:8px;color:var(--faint);font-size:12px;font-family:monospace;">Perintah 1 — buat folder ini jadi git repository:</p>
+        <div class="code" id="cp1">git init<button class="cbtn" onclick="cp('cp1')">Copy</button></div>
+
+        <p style="color:var(--faint);font-size:12px;font-family:monospace;">Perintah 2 — tambahkan semua file:</p>
+        <div class="code" id="cp2">git add .<button class="cbtn" onclick="cp('cp2')">Copy</button></div>
+
+        <p style="color:var(--faint);font-size:12px;font-family:monospace;">Perintah 3 — simpan perubahan:</p>
+        <div class="code" id="cp3">git commit -m "MotoDash v1.0.0"<button class="cbtn" onclick="cp('cp3')">Copy</button></div>
+
+        <p style="color:var(--faint);font-size:12px;font-family:monospace;">Perintah 4 — sambungkan ke GitHub (GANTI USERNAME dengan username GitHub Anda):</p>
+        <div class="code" id="cp4">git remote add origin https://github.com/<span class="hi">USERNAME</span>/motodash.git<button class="cbtn" onclick="cp('cp4')">Copy</button></div>
+
+        <p style="color:var(--faint);font-size:12px;font-family:monospace;">Perintah 5 — set nama branch:</p>
+        <div class="code" id="cp5">git branch -M main<button class="cbtn" onclick="cp('cp5')">Copy</button></div>
+
+        <p style="color:var(--faint);font-size:12px;font-family:monospace;">Perintah 6 — upload ke GitHub:</p>
+        <div class="code" id="cp6">git push -u origin main<button class="cbtn" onclick="cp('cp6')">Copy</button></div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rn">4</div>
+      <div class="rb">
+        <b>Saat diminta login setelah perintah ke-6:</b>
+        <div class="tw">
+          <table>
+            <tr><td><strong>Username:</strong></td><td>Ketik username GitHub Anda (bukan email)</td></tr>
+            <tr><td><strong>Password:</strong></td><td>Paste <strong>Personal Access Token</strong> dari Step B2</td></tr>
+          </table>
+        </div>
+        <div class="alert info" style="margin-top:8px">
+          <span class="ai">💡</span>
+          <p>Saat paste token, teks tidak terlihat di terminal — itu normal dan aman. Paste saja lalu tekan Enter.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rn">5</div>
+      <div class="rb">
+        <b>Verifikasi upload berhasil</b>
+        <p>Buka Chrome → pergi ke: <code>https://github.com/USERNAME/motodash</code><br>
+        Semua file harus terlihat di sana (index.html, css/, js/, dll) ✅</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  FASE C — DEPLOY & INSTALL
+══════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-dot" style="background:var(--green)"></div>
+  <div class="phase-label" style="color:var(--green)">Fase C — Deploy &amp; Install</div>
+</div>
+
+
+<!-- C1 GitHub Pages -->
+<div class="step" id="c1">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,230,118,.15);border:2px solid var(--green);color:var(--green)">C1</div>
+    <h3>Aktifkan GitHub Pages (Hosting Gratis)</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Buka repository di GitHub</b>
+        <p>Pergi ke: <code>https://github.com/USERNAME/motodash</code></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Klik tab "Settings" (ada ikon ⚙)</b>
+        <p>Letaknya di menu atas repo, paling kanan</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Di sidebar kiri → scroll → klik "Pages"</b>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">4</div>
+      <div class="rb">
+        <b>Bagian "Build and deployment" → "Source"</b>
+        <p>Ubah dari "Deploy from a branch" → pilih <strong>"GitHub Actions"</strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">5</div>
+      <div class="rb">
+        <b>Klik tab "Actions" di menu atas repo</b>
+        <p>Terlihat workflow sedang berjalan. Tunggu hingga muncul <span style="color:var(--green)">✅ tanda centang hijau</span> (1–3 menit)</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">6</div>
+      <div class="rb">
+        <b>Kembali ke Settings → Pages</b>
+        <p>URL aplikasi Anda sudah muncul:</p>
+        <div class="code">https://<span class="hi">USERNAME</span>.github.io/motodash/</div>
+        <div class="alert ok" style="margin-top:8px">
+          <span class="ai">🎉</span>
+          <p><strong>Aplikasi sudah online!</strong> Buka URL di atas untuk memastikan.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sep">
+    <div class="row">
+      <div class="rn">⚠</div>
+      <div class="rb">
+        <b>Jika Actions gagal (tanda ❌ merah):</b>
+        <p>Settings → Actions → General → Workflow permissions → pilih <strong>"Read and write permissions"</strong> → Save</p>
+        <p style="margin-top:6px">Lalu jalankan di Command Prompt:</p>
+        <div class="code" id="cretry">git commit --allow-empty -m "retry deploy"
+git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- C2 Install Android -->
+<div class="step" id="c2">
+  <div class="step-head">
+    <div class="num" style="background:rgba(0,230,118,.15);border:2px solid var(--green);color:var(--green)">C2</div>
+    <h3>Install di HP Android</h3>
+  </div>
+  <div class="step-body">
+
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb">
+        <b>Buka Chrome di HP Android</b>
+        <p>Ketik URL ini di address bar:</p>
+        <div class="code">https://<span class="hi">USERNAME</span>.github.io/motodash/</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb">
+        <b>Tunggu peta gelap muncul di panel kanan</b>
+        <p>Jangan install sebelum peta OpenStreetMap muncul</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb">
+        <b>Tap ⋮ (tiga titik) di pojok kanan atas Chrome</b>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">4</div>
+      <div class="rb">
+        <b>Tap "Add to Home screen" atau "Install app"</b>
+        <p>Teksnya beda-beda tergantung versi Chrome. Bisa juga muncul banner di bawah layar secara otomatis.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">5</div>
+      <div class="rb">
+        <b>Tap "Add" → icon MotoDash muncul di home screen</b>
+        <p>Buka icon itu → aplikasi jalan fullscreen landscape tanpa browser bar! ✅</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="rn">6</div>
+      <div class="rb">
+        <b>Izinkan semua akses saat diminta:</b>
+        <div class="tw">
+          <table>
+            <tr><td>📍 Lokasi / Location</td><td>Pilih <strong>"Allow while using app"</strong></td></tr>
+            <tr><td>🎤 Mikrofon / Microphone</td><td>Pilih <strong>"Allow"</strong></td></tr>
+            <tr><td>📡 Bluetooth / Nearby devices</td><td>Pilih <strong>"Allow"</strong></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert warn">
+      <span class="ai">⚠️</span>
+      <p>Tombol install tidak muncul? Pastikan <code>icon-192.png</code> dan <code>icon-512.png</code> sudah ada di folder <code>assets\icons\</code> dan sudah di-upload ke GitHub (Step A2 + B4).</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  FASE D — CARA PAKAI
+══════════════════════════════════════ -->
+<div class="phase" id="d">
+  <div class="phase-dot" style="background:var(--yellow)"></div>
+  <div class="phase-label" style="color:var(--yellow)">Fase D — Cara Pakai Fitur</div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">🛰</div>
+    <h3>GPS Speedometer (Panel Kiri — Otomatis)</h3>
+  </div>
+  <div class="step-body">
+    <p style="color:var(--dim);margin-bottom:12px">Langsung aktif saat aplikasi dibuka. Tidak perlu pengaturan apapun.</p>
+    <div class="tw"><table>
+      <tr><th>Yang Terlihat</th><th>Artinya</th></tr>
+      <tr><td>Angka besar (km/h)</td><td>Kecepatan kendaraan saat ini dari GPS</td></tr>
+      <tr><td>● MOVING / STOPPED</td><td>Status bergerak atau berhenti</td></tr>
+      <tr><td>GPS SEARCHING</td><td>Menunggu sinyal — perlu di luar ruangan</td></tr>
+      <tr><td>GPS GOOD / EXCELLENT</td><td>Sinyal cukup, siap digunakan</td></tr>
+      <tr><td>[ECO] [NORMAL] [SPORT]</td><td>Tap untuk pilih sensitivitas kecepatan</td></tr>
+      <tr><td>TRIP / AVG / MAX / TIME</td><td>Data perjalanan — direset di Settings</td></tr>
+    </table></div>
+  </div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">🗺</div>
+    <h3>Peta &amp; Navigasi (Tap MAPS di dock bawah)</h3>
+  </div>
+  <div class="step-body">
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb"><b>Ketik tujuan di kotak pencarian</b><p>Contoh: "SPBU Pertamina Bekasi" atau "Mall Grand Indonesia"</p></div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb"><b>Tap hasil dari daftar</b><p>Rute biru dihitung otomatis. Bar navigasi muncul di bawah peta.</p></div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb"><b>Ikuti instruksi belokan</b><p>Setiap belokan diumumkan lewat suara. Tap ✕ merah untuk stop.</p></div>
+    </div>
+    <div class="tw" style="margin-top:10px"><table>
+      <tr><td>📍 tombol</td><td>Centre peta ke posisi GPS Anda</td></tr>
+      <tr><td>Geser peta</td><td>Auto-follow berhenti sementara</td></tr>
+      <tr><td>+/− tombol</td><td>Zoom in/out peta</td></tr>
+    </table></div>
+  </div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">🎤</div>
+    <h3>Voice Assistant (Tap VOICE di dock bawah)</h3>
+  </div>
+  <div class="step-body">
+    <p style="color:var(--dim);margin-bottom:10px">Tap <strong>🎤 START LISTENING</strong> lalu ucapkan salah satu perintah:</p>
+    <div class="cmd"><code>"Navigate to [nama tempat]"</code><span>→ langsung mulai navigasi</span></div>
+    <div class="cmd"><code>"Show speed"</code><span>→ ucapkan kecepatan saat ini</span></div>
+    <div class="cmd"><code>"Open maps"</code><span>→ buka panel Maps</span></div>
+    <div class="cmd"><code>"Current location"</code><span>→ centre peta ke posisi GPS</span></div>
+    <div class="cmd"><code>"Zoom in" / "Zoom out"</code><span>→ perbesar/perkecil peta</span></div>
+    <div class="cmd"><code>"Stop navigation"</code><span>→ hentikan rute</span></div>
+    <div class="cmd"><code>"Play" / "Pause"</code><span>→ kontrol musik</span></div>
+    <div class="cmd"><code>"Next" / "Previous"</code><span>→ ganti lagu</span></div>
+  </div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">🎵</div>
+    <h3>Music Player (Tap MUSIC di dock bawah)</h3>
+  </div>
+  <div class="step-body">
+    <div class="row">
+      <div class="rn">1</div>
+      <div class="rb"><b>Tap "📁 Load Audio Files"</b><p>Pilih file MP3/AAC/OGG/WAV dari storage HP. Bisa pilih banyak sekaligus.</p></div>
+    </div>
+    <div class="row">
+      <div class="rn">2</div>
+      <div class="rb"><b>Judul, artis, album, cover art terbaca otomatis</b><p>Dari metadata ID3 yang tersimpan di dalam file musik.</p></div>
+    </div>
+    <div class="row">
+      <div class="rn">3</div>
+      <div class="rb"><b>Lagu pertama diputar otomatis</b><p>🔀 Shuffle · ⏮ Prev · ▶/⏸ Play/Pause · ⏭ Next · 🔁 Repeat</p></div>
+    </div>
+    <div class="alert info">
+      <span class="ai">ℹ️</span>
+      <p>Player ini memutar file lokal dari HP. Browser tidak bisa membaca Spotify/YouTube Music karena dibatasi sistem Android.</p>
+    </div>
+  </div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">📡</div>
+    <h3>Bluetooth (Tap BT di dock bawah)</h3>
+  </div>
+  <div class="step-body">
+    <div class="row"><div class="rn">1</div><div class="rb"><b>Aktifkan Bluetooth di HP</b></div></div>
+    <div class="row"><div class="rn">2</div><div class="rb"><b>Masukkan headset ke mode pairing</b><p>Tahan tombol power ~5 detik sampai lampu berkedip-kedip</p></div></div>
+    <div class="row"><div class="rn">3</div><div class="rb"><b>Tap "🔍 SCAN DEVICES" → pilih headset</b><p>Status berubah ke ● CONNECTED. Suara navigasi akan terdengar di headset.</p></div></div>
+    <div class="alert info">
+      <span class="ai">ℹ️</span>
+      <p>Hanya berjalan di Chrome/Edge Android. GitHub Pages sudah HTTPS ✅ jadi fitur ini otomatis tersedia.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  FASE E — TROUBLESHOOTING
+══════════════════════════════════════ -->
+<div class="phase" id="e">
+  <div class="phase-dot" style="background:var(--red)"></div>
+  <div class="phase-label" style="color:var(--red)">Fase E — Jika Ada Masalah</div>
+</div>
+
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:rgba(255,82,82,.15);border:2px solid var(--red);color:var(--red);font-size:18px">🔧</div>
+    <h3>Solusi untuk Masalah Umum</h3>
+  </div>
+  <div class="step-body">
+    <div class="tw"><table>
+      <tr><th>Masalah</th><th>Solusi</th></tr>
+      <tr>
+        <td><code>fatal: not a git repository</code></td>
+        <td>Belum masuk folder motodash. Buka cmd DI DALAM folder motodash (cara: File Explorer → folder motodash → klik address bar → ketik cmd → Enter), lalu jalankan <code>git init</code> dulu.</td>
+      </tr>
+      <tr>
+        <td>Peta tidak muncul</td>
+        <td>Cek koneksi internet. Refresh halaman. Atau Settings (di app) → Clear Cache → refresh.</td>
+      </tr>
+      <tr>
+        <td>GPS tetap SEARCHING</td>
+        <td>Pergi ke luar ruangan. GPS HP butuh langit terbuka untuk menangkap sinyal satelit.</td>
+      </tr>
+      <tr>
+        <td>Izin lokasi ditolak</td>
+        <td>HP Settings → Apps → Chrome → Permissions → Location → Allow.</td>
+      </tr>
+      <tr>
+        <td>git push meminta password</td>
+        <td>Masukkan Personal Access Token dari Step B2 — bukan password GitHub biasa.</td>
+      </tr>
+      <tr>
+        <td>GitHub Actions ❌ merah</td>
+        <td>Settings repo → Actions → General → "Read and write permissions" → Save. Lalu <code>git commit --allow-empty -m "retry"</code> dan <code>git push</code>.</td>
+      </tr>
+      <tr>
+        <td>404 setelah deploy</td>
+        <td>Tunggu 3–5 menit. Cek tab Actions → workflow harus sudah ✅ hijau.</td>
+      </tr>
+      <tr>
+        <td>Tombol install tidak muncul di Chrome Android</td>
+        <td>Pastikan <code>icon-192.png</code> dan <code>icon-512.png</code> ada di <code>assets\icons\</code> dan sudah ter-upload ke GitHub.</td>
+      </tr>
+      <tr>
+        <td>generate-icons.html tidak mau download</td>
+        <td>Klik kanan gambar icon yang muncul → Save image as → simpan manual ke <code>assets\icons\</code>.</td>
+      </tr>
+      <tr>
+        <td>Voice tidak merespons</td>
+        <td>Harus Chrome/Edge. Pastikan izin mikrofon sudah Allow.</td>
+      </tr>
+    </table></div>
+
+    <div class="alert info" style="margin-top:14px">
+      <span class="ai">🔍</span>
+      <p>Cara cek error di browser: tekan <strong>F12</strong> → klik tab <strong>Console</strong>. Jika ada tulisan merah, screenshot dan kirim ke Claude untuk bantuan lebih lanjut.</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  CARA UPDATE
+══════════════════════════════════════ -->
+<div class="phase">
+  <div class="phase-dot" style="background:var(--faint)"></div>
+  <div class="phase-label" style="color:var(--faint)">Cara Update Aplikasi di Masa Depan</div>
+</div>
+
+<div class="step">
+  <div class="step-head">
+    <div class="num" style="background:var(--muted);color:var(--dim);font-size:18px">🔄</div>
+    <h3>Upload Perubahan Terbaru</h3>
+  </div>
+  <div class="step-body">
+    <p style="color:var(--dim);margin-bottom:10px">Setiap kali ada file yang diubah, jalankan 3 perintah ini:</p>
+    <div class="code" id="cupdate">git add .
+git commit -m "update aplikasi"
+git push<button class="cbtn" onclick="cp('cupdate')">Copy</button></div>
+    <p style="color:var(--dim);font-size:13px;margin-top:8px">GitHub Actions akan otomatis deploy ulang dalam 1–2 menit ✅</p>
+  </div>
+</div>
+
+
+</div><!-- /wrap -->
+
+<div class="foot">
+  🏍 MotoDash v1.0 &nbsp;·&nbsp; Maps © OpenStreetMap &nbsp;·&nbsp; Routing: OSRM &nbsp;·&nbsp; 100% Gratis, tanpa API key
+</div>
+
+<button class="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function cp(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const txt = el.innerText.replace(/\s*(Copy|✓\sOK)\s*$/, '').trim();
+  navigator.clipboard?.writeText(txt).then(() => {
+    const btn = el.querySelector('.cbtn');
+    if (!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = '✓ OK';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 2000);
+  }).catch(() => {
+    /* fallback: select text manually */
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+</script>
+</body>
+</html>

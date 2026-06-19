@@ -325,15 +325,33 @@
             <circle cx="6"  cy="18" r="3"/>
             <circle cx="18" cy="16" r="3"/>
           </svg>
-          MEDIA CONTROL
+          MEDIA PLAYER
         </div>
         <div class="panel-body">
 
-          <!-- Album art -->
+          <!-- File Load Zone -->
+          <div id="media-drop-zone" class="media-drop-zone">
+            <input type="file" id="media-file-input"
+                   accept="audio/*,.mp3,.aac,.ogg,.wav,.flac,.m4a,.opus"
+                   multiple style="display:none">
+            <button id="media-load-btn" class="primary-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Load Audio Files
+            </button>
+            <p class="media-drop-hint">or drag &amp; drop MP3 / AAC / OGG / WAV / FLAC</p>
+          </div>
+
+          <!-- Now Playing cover art -->
           <div class="album-art" id="album-art">
-            <div class="album-art-placeholder">
-              <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="1">
+            <div id="album-art-img" style="display:none;width:100%;height:100%">
+              <img id="cover-img" alt="Cover" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+            </div>
+            <div id="album-art-placeholder" class="album-art-placeholder">
+              <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                 <path d="M9 18V5l12-2v13"/>
                 <circle cx="6"  cy="18" r="3"/>
                 <circle cx="18" cy="16" r="3"/>
@@ -343,22 +361,30 @@
 
           <!-- Track info -->
           <div class="track-info">
-            <div class="track-title"  id="track-title">No media playing</div>
+            <div class="track-title"  id="track-title">No file loaded</div>
             <div class="track-artist" id="track-artist">--</div>
             <div class="track-album"  id="track-album">--</div>
           </div>
 
-          <!-- Progress -->
+          <!-- Progress bar — click to seek -->
           <div class="progress-bar-container">
             <span class="time-label" id="track-current">0:00</span>
-            <div class="progress-bar">
+            <div class="progress-bar" id="progress-bar-click">
               <div class="progress-fill" id="progress-fill" style="width:0%"></div>
             </div>
             <span class="time-label" id="track-total">0:00</span>
           </div>
 
-          <!-- Controls -->
+          <!-- Controls: shuffle prev play next repeat -->
           <div class="media-controls">
+            <button class="media-btn media-btn-sm" id="btn-shuffle" title="Shuffle" style="opacity:.35">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 3 21 3 21 8"/>
+                <line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/>
+                <line x1="15" y1="15" x2="21" y2="21"/>
+              </svg>
+            </button>
             <button class="media-btn" id="btn-prev" title="Previous">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="19 20 9 12 19 4 19 20"/>
@@ -369,8 +395,7 @@
               <svg class="play-icon"  width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="5 3 19 12 5 21 5 3"/>
               </svg>
-              <svg class="pause-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"
-                   style="display:none">
+              <svg class="pause-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display:none">
                 <rect x="6"  y="4" width="4" height="16"/>
                 <rect x="14" y="4" width="4" height="16"/>
               </svg>
@@ -381,21 +406,41 @@
                 <rect x="16" y="4" width="3" height="16"/>
               </svg>
             </button>
+            <button class="media-btn media-btn-sm" id="btn-repeat" title="Repeat" style="opacity:.35">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="17 1 21 5 17 9"/>
+                <path d="M3 11V9a4 4 0 014-4h14"/>
+                <polyline points="7 23 3 19 7 15"/>
+                <path d="M21 13v2a4 4 0 01-4 4H3"/>
+              </svg>
+            </button>
           </div>
 
           <!-- Volume -->
           <div class="volume-control">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
               <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
             </svg>
-            <input type="range" id="volume-slider" class="volume-slider"
-                   min="0" max="100" value="70">
+            <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="85">
           </div>
 
-          <p class="info-note">🎵 Controls the system media session.
-            Start playback in your music app first, then use these buttons.</p>
+          <!-- Playlist -->
+          <div class="playlist-container">
+            <div class="playlist-header">
+              <span>PLAYLIST &middot; <span id="playlist-count-label">0 tracks</span></span>
+              <button id="btn-clear-playlist" class="secondary-btn danger" style="padding:4px 10px;font-size:10px">CLEAR ALL</button>
+            </div>
+            <div id="playlist-items" class="playlist-items">
+              <div class="playlist-empty">
+                <p>No tracks loaded</p>
+                <p class="sub">Tap Load Files to add music</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="info-note">🎵 <strong>Internal player</strong> — load MP3/AAC/WAV/OGG from your device.
+            Controls also appear in Android notification bar &amp; respond to headset buttons.</p>
         </div>
       </div><!-- /panel-music -->
 
@@ -710,6 +755,12 @@
 
 <!-- Leaflet Routing Machine (uses OSRM, no API key) -->
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<!-- jsmediatags — read ID3/metadata tags from local audio files (MP3, AAC, etc.) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+
+<!-- Hidden HTML5 audio element — owned by this page, required for Media Session API -->
+<audio id="audio-player" preload="metadata" style="display:none"></audio>
 
 <!-- App modules (dependency order matters) -->
 <script src="js/utilities.js"></script>

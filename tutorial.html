@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MotoDash — Tutorial</title>
+<style>
+:root{
+  --bg:#07101A;--card:#0F1E2E;--border:#1E3448;
+  --cyan:#00AEEF;--green:#00E676;--orange:#FF9800;
+  --red:#FF5252;--text:#E8F4FD;--dim:#7A9BB5;
+  --muted:#2E4A62;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.6;
+}
+a{color:var(--cyan);}
+
+/* Layout */
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 80px;}
+
+/* Hero */
+.hero{
+  text-align:center;padding:44px 20px 36px;
+  background:linear-gradient(180deg,#0A1E32 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);margin-bottom:8px;
+}
+.logo{
+  font-size:2.6rem;font-weight:900;letter-spacing:6px;
+  background:linear-gradient(90deg,var(--cyan),var(--green));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;display:block;margin-bottom:6px;
+}
+.hero p{color:var(--dim);font-size:.9rem;}
+
+/* Step sections */
+.step{
+  margin:24px 0;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.step-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.2);
+}
+.step-num{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;flex-shrink:0;
+}
+.n-red   {background:rgba(255,82,82,.2);border:2px solid var(--red);   color:var(--red);}
+.n-orange{background:rgba(255,152,0,.2);border:2px solid var(--orange);color:var(--orange);}
+.n-cyan  {background:rgba(0,174,239,.2);border:2px solid var(--cyan);  color:var(--cyan);}
+.n-green {background:rgba(0,230,118,.2);border:2px solid var(--green); color:var(--green);}
+.step-title{font-size:1rem;font-weight:700;color:var(--text);}
+.step-badge{
+  margin-left:auto;padding:3px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;font-family:monospace;
+}
+.b-red   {background:rgba(255,82,82,.15); color:var(--red);}
+.b-orange{background:rgba(255,152,0,.15); color:var(--orange);}
+.b-cyan  {background:rgba(0,174,239,.15); color:var(--cyan);}
+.b-green {background:rgba(0,230,118,.12); color:var(--green);}
+.step-body{padding:20px;}
+
+/* Sub-steps */
+.sub{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.sub:last-child{border:none;padding-bottom:0;}
+.sub-num{
+  min-width:26px;height:26px;border-radius:50%;
+  background:var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--dim);
+  flex-shrink:0;margin-top:1px;
+}
+.sub-content{flex:1;}
+.sub-content strong{display:block;color:var(--text);margin-bottom:3px;}
+.sub-content p{color:var(--dim);font-size:13.5px;margin:0;}
+
+/* Code */
+.code{
+  background:#030A12;border:1px solid var(--muted);
+  border-radius:6px;padding:12px 14px;margin:8px 0;
+  font-family:'Cascadia Code','Fira Code',Consolas,monospace;
+  font-size:13px;color:#90CAF9;overflow-x:auto;
+  white-space:pre;position:relative;
+}
+.code .dim{color:#2E5A7A;}
+.code .hi {color:var(--orange);}
+.copy{
+  position:absolute;top:8px;right:8px;
+  padding:3px 10px;background:var(--border);border:1px solid var(--muted);
+  border-radius:4px;color:var(--dim);font-size:11px;cursor:pointer;
+  font-family:inherit;transition:all .15s;
+}
+.copy:hover{color:var(--cyan);border-color:var(--cyan);}
+.copy.ok{color:var(--green);border-color:var(--green);}
+
+/* Alerts */
+.alert{
+  display:flex;gap:10px;padding:11px 14px;
+  border-radius:6px;margin:10px 0;font-size:13px;
+  align-items:flex-start;
+}
+.alert-i{font-size:16px;flex-shrink:0;margin-top:1px;}
+.info  {background:rgba(0,174,239,.08);border:1px solid rgba(0,174,239,.25);}
+.warn  {background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.25);}
+.ok    {background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.22);}
+.danger{background:rgba(255,82,82,.08); border:1px solid rgba(255,82,82,.25);}
+.info   p{color:#7dd3f5;margin:0;}
+.warn   p{color:#ffcc80;margin:0;}
+.ok     p{color:#a5d6a7;margin:0;}
+.danger p{color:#ef9a9a;margin:0;}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;}
+th{background:rgba(0,0,0,.3);padding:9px 12px;text-align:left;
+   color:var(--cyan);font-size:11px;letter-spacing:1px;
+   border-bottom:1px solid var(--border);}
+td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--dim);}
+tr:last-child td{border:none;}
+.tag{
+  display:inline-block;padding:2px 7px;border-radius:4px;
+  font-size:11px;font-weight:700;
+}
+.tok{background:rgba(0,230,118,.15);color:var(--green);}
+.twn{background:rgba(255,152,0,.15); color:var(--orange);}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0;}
+@media(max-width:540px){.g2{grid-template-columns:1fr;}}
+
+/* Small cards */
+.mini{
+  background:rgba(0,0,0,.2);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;
+}
+.mini h4{font-size:.85rem;margin-bottom:6px;font-weight:700;}
+.mini p{font-size:12px;color:var(--dim);margin:0;}
+
+/* Command list */
+.cmd{
+  background:rgba(0,0,0,.2);border-left:3px solid var(--cyan);
+  border-radius:0 6px 6px 0;
+  padding:8px 12px;margin:5px 0;
+  display:flex;gap:12px;align-items:center;
+}
+.cmd code{
+  font-size:12.5px;color:var(--cyan);background:none;
+  border:none;padding:0;
+}
+.cmd span{font-size:12px;color:var(--dim);}
+
+/* Footer */
+.foot{text-align:center;padding:32px 0;color:var(--muted);font-size:12px;}
+
+/* Back to top */
+.btt{
+  position:fixed;bottom:20px;right:20px;
+  width:42px;height:42px;border-radius:50%;
+  background:var(--cyan);color:#000;border:none;
+  font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,174,239,.4);
+  transition:transform .2s;z-index:999;
+}
+.btt:hover{transform:translateY(-2px);}
+
+/* Section divider */
+.divider{
+  text-align:center;color:var(--muted);
+  font-size:10px;letter-spacing:4px;font-family:monospace;
+  margin:32px 0 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <span class="logo">MOTODASH</span>
+  <p>Tutorial Singkat — Dari Download Sampai Jalan di Motor</p>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════
+  STEP 1 — PUTUS GIT LAMA
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-red">1</div>
+    <div class="step-title">Putus Koneksi Git Lama</div>
+    <span class="step-badge b-red">Jika sudah pernah push</span>
+  </div>
+  <div class="step-body">
+
+    <div class="alert info">
+      <span class="alert-i">ℹ️</span>
+      <p>Jika belum pernah push ke GitHub sebelumnya, <strong>lewati step ini</strong> dan langsung ke Step 2.</p>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">A</div>
+      <div class="sub-content">
+        <strong>Cek apakah ada koneksi git lama</strong>
+        <div class="code" id="c1a">git remote -v<button class="copy" onclick="cp('c1a')">Copy</button></div>
+        <p>Jika muncul URL github.com → ada koneksi lama yang harus diputus.</p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">B</div>
+      <div class="sub-content">
+        <strong>Pilih salah satu cara memutus:</strong>
+        <div class="g2" style="margin-top:8px;">
+          <div class="mini">
+            <h4 style="color:var(--green);">✅ Cara mudah</h4>
+            <p>Pakai folder baru dari ZIP yang baru di-extract. Tidak perlu lakukan apapun — langsung ke Step 2.</p>
+          </div>
+          <div class="mini">
+            <h4 style="color:var(--orange);">Hapus .git manual</h4>
+            <p>Jika ingin pakai folder yang sama, hapus folder .git:</p>
+          </div>
+        </div>
+        <div class="code" id="c1b"><span class="dim"># Mac / Linux:</span>
+rm -rf .git
+
+<span class="dim"># Windows PowerShell:</span>
+Remove-Item -Recurse -Force .git<button class="copy" onclick="cp('c1b')">Copy</button></div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">C</div>
+      <div class="sub-content">
+        <strong>Hapus repo lama di GitHub (opsional)</strong>
+        <p>GitHub → repo lama → Settings → scroll bawah → <strong>Danger Zone</strong> → Delete this repository</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  STEP 2 — EXTRACT & CEK
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-orange">2</div>
+    <div class="step-title">Extract File &amp; Cek Lokal</div>
+    <span class="step-badge b-orange">~5 menit</span>
+  </div>
+  <div class="step-body">
+
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content">
+        <strong>Extract motodash_final.zip</strong>
+        <p>Simpan di lokasi mudah, contoh: <code>C:\Projects\motodash\</code> atau <code>~/Projects/motodash/</code></p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content">
+        <strong>Buka Terminal → masuk ke folder</strong>
+        <div class="code" id="c2a"><span class="dim"># Mac/Linux:</span>
+cd ~/Projects/motodash
+
+<span class="dim"># Windows:</span>
+cd C:\Projects\motodash<button class="copy" onclick="cp('c2a')">Copy</button></div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content">
+        <strong>Jalankan local server</strong>
+        <div class="code" id="c2b">python3 -m http.server 8080<button class="copy" onclick="cp('c2b')">Copy</button></div>
+        <p>Windows tanpa Python: <code>npx serve . -p 8080</code></p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">4</div>
+      <div class="sub-content">
+        <strong>Buka Chrome → ketik di address bar:</strong>
+        <div class="code" id="c2c">http://localhost:8080<button class="copy" onclick="cp('c2c')">Copy</button></div>
+        <p>Dashboard harus muncul dengan peta OpenStreetMap di panel kanan. ✅</p>
+      </div>
+    </div>
+
+    <div class="alert danger">
+      <span class="alert-i">🚫</span>
+      <p>Jangan buka file HTML langsung (double-click). GPS dan fitur lain tidak akan bekerja tanpa server HTTP.</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  STEP 3 — GENERATE ICON
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-orange">3</div>
+    <div class="step-title">Generate Icon PNG</div>
+    <span class="step-badge b-orange">Wajib untuk Install</span>
+  </div>
+  <div class="step-body">
+
+    <div class="alert warn">
+      <span class="alert-i">⚠️</span>
+      <p>Tanpa icon PNG 192×192 dan 512×512, Chrome Android tidak akan menampilkan tombol "Add to Home Screen".</p>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content">
+        <strong>Buka halaman generator (server harus jalan)</strong>
+        <div class="code" id="c3a">http://localhost:8080/generate-icons.html<button class="copy" onclick="cp('c3a')">Copy</button></div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content">
+        <strong>Klik "Generate Icons" → Download 2 file:</strong>
+        <p>⬇ <code>icon-192.png</code> &nbsp;⬇ <code>icon-512.png</code></p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content">
+        <strong>Simpan kedua file ke:</strong>
+        <div class="code">motodash/assets/icons/icon-192.png
+motodash/assets/icons/icon-512.png</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  STEP 4 — PUSH KE GITHUB
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-cyan">4</div>
+    <div class="step-title">Push ke GitHub</div>
+    <span class="step-badge b-cyan">~10 menit</span>
+  </div>
+  <div class="step-body">
+
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content">
+        <strong>Set identitas Git (sekali saja per komputer)</strong>
+        <div class="code" id="c4a">git config --global user.name <span class="hi">"Nama Anda"</span>
+git config --global user.email <span class="hi">"email@anda.com"</span><button class="copy" onclick="cp('c4a')">Copy</button></div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content">
+        <strong>Buat repository baru di GitHub</strong>
+        <p>Buka <a href="https://github.com/new" target="_blank">github.com/new</a></p>
+        <table>
+          <tr><td>Repository name</td><td><code>motodash</code></td></tr>
+          <tr><td>Visibility</td><td><strong>✅ Public</strong> (wajib untuk GitHub Pages gratis)</td></tr>
+          <tr><td>Initialize README</td><td>❌ Jangan dicentang</td></tr>
+        </table>
+        <p style="margin-top:6px;">→ Klik <strong>Create repository</strong></p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content">
+        <strong>Jalankan perintah ini di terminal (ganti USERNAME)</strong>
+        <div class="code" id="c4b">git init
+git add .
+git commit -m "feat: MotoDash v1.0.0"
+git remote add origin https://github.com/<span class="hi">USERNAME</span>/motodash.git
+git branch -M main
+git push -u origin main<button class="copy" onclick="cp('c4b')">Copy</button></div>
+        <div class="alert warn" style="margin-top:8px;">
+          <span class="alert-i">🔑</span>
+          <p>Saat diminta password → <strong>paste Personal Access Token</strong>, bukan password GitHub biasa.<br>
+          Buat token di: <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a> → centang <strong>repo</strong> → Generate.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">4</div>
+      <div class="sub-content">
+        <strong>Verifikasi — buka browser</strong>
+        <div class="code">https://github.com/<span class="hi">USERNAME</span>/motodash</div>
+        <p>Semua file harus terlihat di sana. ✅</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  STEP 5 — AKTIFKAN GITHUB PAGES
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-cyan">5</div>
+    <div class="step-title">Aktifkan GitHub Pages</div>
+    <span class="step-badge b-cyan">~2 menit</span>
+  </div>
+  <div class="step-body">
+
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content">
+        <strong>Buka repository</strong> → klik tab <strong>Settings</strong>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content">
+        <strong>Sidebar kiri → Pages</strong>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content">
+        <strong>Build and deployment → Source → pilih "GitHub Actions"</strong>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">4</div>
+      <div class="sub-content">
+        <strong>Klik tab "Actions" → tunggu workflow selesai ✅</strong>
+        <p>(biasanya 1–2 menit, muncul centang hijau)</p>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">5</div>
+      <div class="sub-content">
+        <strong>URL aplikasi Anda sudah live:</strong>
+        <div class="code">https://<span class="hi">USERNAME</span>.github.io/motodash/</div>
+        <div class="alert ok" style="margin-top:8px;">
+          <span class="alert-i">🎉</span>
+          <p>Aplikasi online! Setiap kali push, auto-deploy dalam 1–2 menit.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-num">⚠</div>
+      <div class="sub-content">
+        <strong>Jika Actions gagal (❌ merah)</strong>
+        <p>Settings → Actions → General → Workflow permissions → <strong>Read and write</strong> → Save → push ulang:</p>
+        <div class="code" id="c5a">git commit --allow-empty -m "retry deploy"
+git push<button class="copy" onclick="cp('c5a')">Copy</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  STEP 6 — INSTALL DI ANDROID
+══════════════════════════════════ -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green">6</div>
+    <div class="step-title">Install di Android</div>
+    <span class="step-badge b-green">Langkah Terakhir</span>
+  </div>
+  <div class="step-body">
+
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content">
+        <strong>Buka Chrome Android</strong>
+        <div class="code">https://<span class="hi">USERNAME</span>.github.io/motodash/</div>
+      </div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content">
+        <strong>Tunggu peta muncul</strong> (loading penuh dulu)
+      </div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content">
+        <strong>Tap menu ⋮ → "Add to Home Screen"</strong> atau <strong>"Install app"</strong>
+      </div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">4</div>
+      <div class="sub-content">
+        <strong>Tap Add → icon muncul di home screen</strong> 🎉
+      </div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">5</div>
+      <div class="sub-content">
+        <strong>Izinkan semua akses saat diminta:</strong>
+        <table style="margin-top:8px;">
+          <tr><td>📍 Lokasi</td><td>Allow while using app</td></tr>
+          <tr><td>🎤 Mikrofon</td><td>Allow</td></tr>
+          <tr><td>📡 Bluetooth</td><td>Allow</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="alert warn" style="margin-top:8px;">
+      <span class="alert-i">⚠️</span>
+      <p>Tombol install tidak muncul? Pastikan <code>icon-192.png</code> dan <code>icon-512.png</code> sudah ada di <code>assets/icons/</code> dan sudah di-push ke GitHub.</p>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  CARA PAKAI FITUR
+══════════════════════════════════ -->
+<div class="divider">— CARA PAKAI —</div>
+
+
+<!-- Speedometer -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green" style="font-size:18px;">🛰</div>
+    <div class="step-title">GPS Speedometer</div>
+    <span class="step-badge b-green">Panel Kiri</span>
+  </div>
+  <div class="step-body">
+    <p style="color:var(--dim);margin-bottom:12px;">Otomatis berjalan. Tunjukkan kecepatan real-time dari GPS.</p>
+    <table>
+      <tr><th>Elemen</th><th>Keterangan</th></tr>
+      <tr><td>Angka besar</td><td>Kecepatan saat ini (km/h)</td></tr>
+      <tr><td>● MOVING / STOPPED</td><td>Status kendaraan</td></tr>
+      <tr><td>ECO / NORMAL / SPORT</td><td>Sensitivitas filter GPS — tap untuk pilih</td></tr>
+      <tr><td>GPS SIG</td><td>Kualitas sinyal: EXCELLENT → GOOD → FAIR → POOR</td></tr>
+      <tr><td>TRIP / AVG / MAX / TIME</td><td>Data perjalanan (reset di Settings)</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- Maps -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green" style="font-size:18px;">🗺</div>
+    <div class="step-title">Peta &amp; Navigasi</div>
+    <span class="step-badge b-green">Panel MAPS</span>
+  </div>
+  <div class="step-body">
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content"><strong>Ketik tujuan</strong> di search bar atas → pilih dari hasil</div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content"><strong>Rute otomatis dihitung</strong> → garis biru + instruksi belokan</div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content"><strong>Tap ✕ merah</strong> untuk stop navigasi</div>
+    </div>
+    <table style="margin-top:10px;">
+      <tr><td>📍 tombol</td><td>Centre peta ke posisi GPS</td></tr>
+      <tr><td>Drag peta</td><td>Auto-follow mati sementara</td></tr>
+      <tr><td>+/− tombol</td><td>Zoom in/out</td></tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- Voice -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green" style="font-size:18px;">🎤</div>
+    <div class="step-title">Voice Assistant</div>
+    <span class="step-badge b-green">Panel VOICE</span>
+  </div>
+  <div class="step-body">
+    <p style="color:var(--dim);margin-bottom:12px;">Tap <strong>🎤 START LISTENING</strong> lalu ucapkan perintah:</p>
+    <div class="cmd"><code>"Navigate to [tempat]"</code><span>→ Cari &amp; mulai navigasi</span></div>
+    <div class="cmd"><code>"Show speed"</code><span>→ Ucapkan kecepatan saat ini</span></div>
+    <div class="cmd"><code>"Open maps"</code><span>→ Buka panel Maps</span></div>
+    <div class="cmd"><code>"Current location"</code><span>→ Centre peta ke posisi GPS</span></div>
+    <div class="cmd"><code>"Zoom in" / "Zoom out"</code><span>→ Zoom peta</span></div>
+    <div class="cmd"><code>"Stop navigation"</code><span>→ Hentikan rute</span></div>
+    <div class="cmd"><code>"Play" / "Pause"</code><span>→ Kontrol musik</span></div>
+    <div class="cmd"><code>"Next" / "Previous"</code><span>→ Ganti lagu</span></div>
+  </div>
+</div>
+
+
+<!-- Bluetooth -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green" style="font-size:18px;">📡</div>
+    <div class="step-title">Bluetooth Headset</div>
+    <span class="step-badge b-green">Panel BT</span>
+  </div>
+  <div class="step-body">
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content"><strong>Aktifkan Bluetooth di HP</strong></div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content"><strong>Masukkan headset ke mode pairing</strong> (tahan tombol power ~5 detik)</div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content"><strong>Tap SCAN DEVICES</strong> → pilih headset dari daftar</div>
+    </div>
+    <div class="alert info" style="margin-top:8px;">
+      <span class="alert-i">ℹ️</span>
+      <p>Hanya berjalan di Chrome / Edge Android + HTTPS (GitHub Pages sudah ✅).</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- Music -->
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-green" style="font-size:18px;">🎵</div>
+    <div class="step-title">Media Player</div>
+    <span class="step-badge b-green">Panel MUSIC</span>
+  </div>
+  <div class="step-body">
+    <div class="sub">
+      <div class="sub-num">1</div>
+      <div class="sub-content"><strong>Tap 📁 Load Audio Files</strong> → pilih file MP3/AAC/OGG/WAV dari HP</div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">2</div>
+      <div class="sub-content"><strong>Metadata terbaca otomatis</strong> — judul, artis, album, cover art</div>
+    </div>
+    <div class="sub">
+      <div class="sub-num">3</div>
+      <div class="sub-content"><strong>Lagu pertama diputar otomatis</strong> → kontrol via tombol atau suara</div>
+    </div>
+    <table style="margin-top:8px;">
+      <tr><td>🔀</td><td>Shuffle</td><td>🔁</td><td>Repeat</td></tr>
+      <tr><td>⏮ / ⏭</td><td>Prev / Next</td><td>▶ / ⏸</td><td>Play / Pause</td></tr>
+      <tr><td colspan="2">Progress bar</td><td colspan="2">Tap untuk seek ke posisi</td></tr>
+    </table>
+    <div class="alert info" style="margin-top:10px;">
+      <span class="alert-i">ℹ️</span>
+      <p>Browser tidak bisa membaca Spotify / YouTube Music (sandbox Android). Player ini memutar file lokal dari storage HP Anda.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+  TROUBLESHOOTING
+══════════════════════════════════ -->
+<div class="divider">— TROUBLESHOOTING —</div>
+
+<div class="step">
+  <div class="step-head">
+    <div class="step-num n-red" style="font-size:16px;">🔧</div>
+    <div class="step-title">Masalah Umum &amp; Solusi</div>
+  </div>
+  <div class="step-body">
+    <table>
+      <tr><th>Masalah</th><th>Solusi</th></tr>
+      <tr><td>Peta tidak muncul</td><td>Cek koneksi internet → refresh → atau Settings → Clear Cache</td></tr>
+      <tr><td>GPS tetap SEARCHING</td><td>Keluar ruangan, langit terbuka. GPS butuh sinyal satelit.</td></tr>
+      <tr><td>Izin lokasi ditolak</td><td>HP Settings → Apps → Chrome → Permissions → Location → Allow</td></tr>
+      <tr><td>Voice tidak jalan</td><td>Harus Chrome/Edge. Izinkan akses mikrofon saat diminta.</td></tr>
+      <tr><td>BT tidak connect</td><td>Harus HTTPS + Chrome. Masukkan headset ke mode pairing.</td></tr>
+      <tr><td>PWA tidak bisa install</td><td>Pastikan icon-192.png &amp; icon-512.png ada di assets/icons/ dan sudah di-push.</td></tr>
+      <tr><td>404 setelah deploy</td><td>Tunggu 2–5 menit. Cek Actions sudah ✅. Cek Pages sudah aktif.</td></tr>
+      <tr><td>Push rejected</td><td>Gunakan Personal Access Token, bukan password GitHub biasa.</td></tr>
+    </table>
+    <div class="alert info" style="margin-top:12px;">
+      <span class="alert-i">🔍</span>
+      <p>Untuk debug: tekan <strong>F12</strong> di Chrome → tab Console. Tidak ada error merah = aplikasi normal.</p>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="foot">
+  🏍 MotoDash v1.0 · Maps: © OpenStreetMap · Routing: OSRM · No API key · Gratis
+</div>
+
+<button class="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function cp(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  // Get text, strip HTML tags
+  const txt = el.innerText.replace(/Copy$/,'').trim();
+  navigator.clipboard?.writeText(txt).then(() => {
+    const btn = el.querySelector('.copy');
+    if(!btn) return;
+    const o = btn.textContent;
+    btn.textContent = '✓';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = o; btn.classList.remove('ok'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

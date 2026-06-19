@@ -313,10 +313,13 @@ html, body {
 
 /* ═══════════════════════════════════════════════════════════════════
    MAPS PANEL
+   #panel-maps inherits position:absolute; inset:0 from .content-panel
+   DO NOT add position:relative here — it would cause height:0 on
+   #map-container which is positioned absolute relative to this element.
    ═══════════════════════════════════════════════════════════════════ */
-#panel-maps { position:relative; }
 
 /* Toolbar */
+/* Toolbar — floats inside maps panel */
 #map-toolbar {
     position:absolute; top:10px; left:10px; right:10px;
     z-index:500; display:flex; gap:8px; align-items:center;
@@ -668,12 +671,97 @@ html, body {
 .secondary-btn.danger { border-color:rgba(255,68,68,.28); color:rgba(255,68,68,.65); }
 .secondary-btn.danger:hover { border-color:var(--clr-danger); color:var(--clr-danger); }
 
-/* Info note */
+/* ─── Info note ──────────────────────────────────────────── */
 .info-note {
     font-size:11px; color:var(--clr-muted); line-height:1.55;
     background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06);
     border-radius:4px; padding:8px 11px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MEDIA PLAYER — Internal Audio Player
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Drop / Load Zone */
+.media-drop-zone {
+    border:2px dashed var(--border); border-radius:var(--radius);
+    padding:16px; text-align:center;
+    transition:all .2s var(--ease);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.media-drop-zone.drag-over {
+    border-color:var(--clr-primary);
+    background:rgba(0,174,239,.08);
+    box-shadow:var(--glow-p);
+}
+.media-drop-hint { font-size:11px; color:var(--clr-muted); }
+
+/* Small media button variant (shuffle, repeat) */
+.media-btn.media-btn-sm {
+    width:38px; height:38px; color:var(--clr-dim);
+    transition:all .2s var(--ease);
+}
+.media-btn.media-btn-sm:hover { color:var(--clr-primary); opacity:1 !important; }
+
+/* Playlist container */
+.playlist-container {
+    background:var(--bg-panel); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden;
+}
+.playlist-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 12px;
+    font-family:var(--f-mono); font-size:9px; letter-spacing:2px;
+    color:var(--clr-muted); border-bottom:1px solid var(--border);
+    background:rgba(0,0,0,.2);
+}
+.playlist-items {
+    max-height:180px; overflow-y:auto;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+}
+.playlist-items::-webkit-scrollbar { width:3px; }
+.playlist-items::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+.playlist-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px; cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.04);
+    transition:background .15s;
+}
+.playlist-item:last-child { border-bottom:none; }
+.playlist-item:hover { background:rgba(0,174,239,.07); }
+.playlist-item.pl-active {
+    background:rgba(0,174,239,.1);
+    border-left:2px solid var(--clr-primary);
+}
+
+.pl-num {
+    font-family:var(--f-mono); font-size:11px;
+    color:var(--clr-muted); min-width:18px; text-align:center;
+}
+.pl-playing-dot { color:var(--clr-primary); font-size:10px; }
+
+.pl-info { flex:1; min-width:0; }
+.pl-title {
+    font-size:12px; color:var(--clr-text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.pl-artist { font-size:10px; color:var(--clr-dim); margin-top:1px; }
+
+.pl-remove-btn {
+    width:22px; height:22px; border-radius:50%;
+    background:transparent; border:none;
+    color:var(--clr-muted); cursor:pointer; font-size:10px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:all .15s;
+}
+.pl-remove-btn:hover { background:rgba(255,68,68,.2); color:var(--clr-danger); }
+
+.playlist-empty {
+    padding:24px; text-align:center;
+    color:var(--clr-muted); font-size:12px;
+}
+.playlist-empty .sub { font-size:10px; color:rgba(255,255,255,.12); margin-top:4px; }
 
 /* ═══════════════════════════════════════════════════════════════════
    BOTTOM DOCK

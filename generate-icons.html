@@ -1,91 +1,399 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>MotoDash — Generate PWA Icons</title>
-  <style>
-    body { font-family: sans-serif; padding: 30px; background: #111; color: #eee; }
-    h2   { color: #00AEEF; }
-    p    { color: #aaa; margin: 8px 0; }
-    a    { color: #00FF66; }
-    .btn {
-      display: inline-block; margin-top: 20px; padding: 12px 28px;
-      background: #00AEEF; color: #000; border-radius: 8px;
-      font-weight: 700; cursor: pointer; border: none; font-size: 14px;
-    }
-    canvas { display: none; }
-    .icon-preview { margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap; }
-    .icon-item { text-align: center; }
-    .icon-item img { border-radius: 12px; display: block; border: 1px solid #333; }
-    .icon-item p { font-size: 12px; color: #888; }
-    .dl-link { color: #00FF66; font-size: 12px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MotoDash — Generate Icon</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #07101A;
+  color: #E8F4FD;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.box {
+  background: #0D1B2A;
+  border: 1px solid #1A3048;
+  border-radius: 16px;
+  padding: 36px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+.logo {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  background: linear-gradient(90deg, #00AEEF, #00E676);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  margin-bottom: 6px;
+}
+.subtitle {
+  color: #7A9BB5;
+  font-size: .85rem;
+  margin-bottom: 28px;
+}
+.info-box {
+  background: rgba(0,174,239,.08);
+  border: 1px solid rgba(0,174,239,.25);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #7dd3f5;
+  text-align: left;
+  line-height: 1.6;
+}
+.btn-generate {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #00AEEF, #0088CC);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 24px;
+}
+.btn-generate:hover { opacity: .88; transform: translateY(-1px); }
+.btn-generate:active { transform: translateY(0); }
+.btn-generate:disabled {
+  background: #1A3048;
+  color: #3A5068;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Hidden canvases */
+#cv192, #cv512 { display: none; }
+
+/* Results */
+.results { display: none; }
+.results.show { display: block; }
+.result-title {
+  font-size: .75rem;
+  letter-spacing: 3px;
+  color: #3A5068;
+  font-family: monospace;
+  margin-bottom: 16px;
+}
+.icons-row {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.icon-item { text-align: center; }
+.icon-item img {
+  border-radius: 14px;
+  display: block;
+  margin: 0 auto 8px;
+  border: 2px solid #1A3048;
+}
+.icon-item p {
+  font-size: 11px;
+  color: #3A5068;
+  margin-bottom: 8px;
+  font-family: monospace;
+}
+.btn-dl {
+  display: inline-block;
+  padding: 8px 18px;
+  background: rgba(0,230,118,.12);
+  border: 1px solid rgba(0,230,118,.35);
+  border-radius: 6px;
+  color: #00E676;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .15s;
+}
+.btn-dl:hover { background: rgba(0,230,118,.22); }
+
+.divider {
+  border: none;
+  border-top: 1px solid #1A3048;
+  margin: 20px 0;
+}
+.next-steps {
+  text-align: left;
+  background: rgba(0,0,0,.2);
+  border: 1px solid #1A3048;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.next-steps h4 {
+  font-size: .75rem;
+  letter-spacing: 2px;
+  color: #00AEEF;
+  margin-bottom: 10px;
+  font-family: monospace;
+}
+.next-steps ol {
+  padding-left: 18px;
+  color: #7A9BB5;
+  font-size: 13px;
+  line-height: 2;
+}
+.next-steps code {
+  background: #1A3048;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #90CAF9;
+}
+
+.status {
+  font-size: 13px;
+  color: #7A9BB5;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+.status.ok { color: #00E676; }
+.status.err { color: #FF5252; }
+</style>
 </head>
 <body>
-  <h2>🏍 MotoDash — PWA Icon Generator</h2>
-  <p>This tool generates the required PNG icons from the SVG for PWA installation on Android Chrome.</p>
-  <p>After generating, save <strong>icon-192.png</strong> and <strong>icon-512.png</strong> into <code>assets/icons/</code></p>
 
-  <button class="btn" onclick="generate()">Generate PNG Icons</button>
+<div class="box">
 
-  <canvas id="c192" width="192" height="192"></canvas>
-  <canvas id="c512" width="512" height="512"></canvas>
+  <span class="logo">MOTODASH</span>
+  <p class="subtitle">Generator Icon PNG — Double-click, langsung jalan!</p>
 
-  <div class="icon-preview" id="preview"></div>
+  <div class="info-box">
+    ✅ <strong>Tidak butuh server, tidak butuh Python.</strong><br>
+    Cukup double-click file ini, klik tombol di bawah,<br>
+    lalu download kedua file icon PNG.
+  </div>
 
-  <script>
-    const SVG_URL = 'assets/icons/icon.svg';
+  <!-- Hidden canvases for rendering -->
+  <canvas id="cv192" width="192" height="192"></canvas>
+  <canvas id="cv512" width="512" height="512"></canvas>
 
-    async function generate() {
-      const preview = document.getElementById('preview');
-      preview.innerHTML = '<p style="color:#aaa">Generating…</p>';
+  <div class="status" id="status"></div>
 
-      const svgText = await fetch(SVG_URL).then(r => r.text());
-      const blob    = new Blob([svgText], { type: 'image/svg+xml' });
-      const url     = URL.createObjectURL(blob);
-      const img     = new Image();
+  <button class="btn-generate" id="btn" onclick="generate()">
+    🎨 Generate Icon Sekarang
+  </button>
 
-      img.onload = () => {
+  <!-- Results — shown after generate -->
+  <div class="results" id="results">
+    <div class="result-title">ICON SIAP DIDOWNLOAD</div>
+    <div class="icons-row">
+      <div class="icon-item">
+        <img id="prev192" width="96" height="96" alt="192x192">
+        <p>icon-192.png</p>
+        <a id="dl192" class="btn-dl" download="icon-192.png">⬇ Download</a>
+      </div>
+      <div class="icon-item">
+        <img id="prev512" width="96" height="96" alt="512x512">
+        <p>icon-512.png</p>
+        <a id="dl512" class="btn-dl" download="icon-512.png">⬇ Download</a>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="next-steps">
+      <h4>LANGKAH BERIKUTNYA</h4>
+      <ol>
+        <li>Pindahkan kedua file ke folder:<br>
+          <code>motodash\assets\icons\</code></li>
+        <li>Pastikan folder berisi:<br>
+          <code>icon.svg</code> + <code>icon-192.png</code> + <code>icon-512.png</code></li>
+        <li>Lanjut push ke GitHub</li>
+      </ol>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   SVG ICON — embedded langsung, tidak perlu fetch
+   Bekerja via file:// maupun http://
+════════════════════════════════════════════ */
+const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+
+  <!-- Background hitam rounded -->
+  <rect width="512" height="512" rx="90" fill="#050505"/>
+
+  <!-- Outer glow ring -->
+  <circle cx="256" cy="242" r="192" fill="none"
+          stroke="#00AEEF" stroke-width="3" opacity="0.12"/>
+
+  <!-- Speedometer track arc (270° sweep) -->
+  <circle cx="256" cy="242" r="166"
+          fill="none" stroke="#0A1E30" stroke-width="26"
+          stroke-dasharray="730 52"
+          stroke-dashoffset="-26"
+          stroke-linecap="round"/>
+
+  <!-- Speedometer fill arc — ~65% filled -->
+  <circle cx="256" cy="242" r="166"
+          fill="none" stroke="#00AEEF" stroke-width="26"
+          stroke-dasharray="475 307"
+          stroke-dashoffset="-26"
+          stroke-linecap="round"
+          opacity="0.95"/>
+
+  <!-- Inner accent ring -->
+  <circle cx="256" cy="242" r="134"
+          fill="none" stroke="#00AEEF"
+          stroke-width="1.5" opacity="0.18"/>
+
+  <!-- Tick marks -->
+  <line x1="256" y1="82" x2="256" y2="100"
+        stroke="#00AEEF" stroke-width="4"
+        stroke-linecap="round" opacity="0.7"/>
+  <line x1="90" y1="242" x2="108" y2="242"
+        stroke="#00AEEF" stroke-width="4"
+        stroke-linecap="round" opacity="0.5"/>
+  <line x1="370" y1="118" x2="382" y2="106"
+        stroke="#00AEEF" stroke-width="4"
+        stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Needle -->
+  <line x1="256" y1="242" x2="372" y2="122"
+        stroke="#00AEEF" stroke-width="7"
+        stroke-linecap="round"/>
+  <line x1="256" y1="242" x2="210" y2="340"
+        stroke="#1A3048" stroke-width="5"
+        stroke-linecap="round"/>
+
+  <!-- Center hub outer -->
+  <circle cx="256" cy="242" r="22"
+          fill="#00AEEF" opacity="0.9"/>
+  <!-- Center hub inner -->
+  <circle cx="256" cy="242" r="12"
+          fill="#ffffff"/>
+
+  <!-- Speed number -->
+  <text x="256" y="226"
+        text-anchor="middle"
+        fill="#FFFFFF"
+        font-size="68"
+        font-weight="900"
+        font-family="Arial Black, Arial, sans-serif"
+        letter-spacing="-2">68</text>
+
+  <!-- km/h label -->
+  <text x="256" y="266"
+        text-anchor="middle"
+        fill="#00AEEF"
+        font-size="22"
+        font-weight="400"
+        font-family="Arial, sans-serif"
+        letter-spacing="6">km/h</text>
+
+  <!-- Bottom separator line -->
+  <rect x="128" y="432" width="256" height="3"
+        rx="2" fill="#00AEEF" opacity="0.35"/>
+
+  <!-- App name -->
+  <text x="256" y="478"
+        text-anchor="middle"
+        fill="#FFFFFF"
+        font-size="30"
+        font-weight="900"
+        font-family="Arial Black, Arial, sans-serif"
+        letter-spacing="10"
+        opacity="0.88">MOTODASH</text>
+
+</svg>`;
+
+/* ════════════════════════════════════════════
+   GENERATE FUNCTION
+════════════════════════════════════════════ */
+function generate() {
+  const btn    = document.getElementById('btn');
+  const status = document.getElementById('status');
+  const results = document.getElementById('results');
+
+  btn.disabled     = true;
+  btn.textContent  = '⏳ Generating…';
+  status.textContent = 'Menyiapkan icon…';
+  status.className   = 'status';
+
+  try {
+    /* Buat Blob URL dari SVG string — tidak butuh fetch */
+    const blob = new Blob([SVG], { type: 'image/svg+xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const img  = new Image();
+
+    img.onload = () => {
+      try {
         const sizes = [192, 512];
-        const links = [];
+        const oks   = [];
 
         sizes.forEach(sz => {
-          const canvas = document.createElement('canvas');
-          canvas.width = canvas.height = sz;
-          const ctx = canvas.getContext('2d');
+          const cv  = document.getElementById(`cv${sz}`);
+          const ctx = cv.getContext('2d');
+
+          /* Clear canvas */
+          ctx.clearRect(0, 0, sz, sz);
+
+          /* Draw SVG ke canvas */
           ctx.drawImage(img, 0, 0, sz, sz);
 
-          const pngUrl  = canvas.toDataURL('image/png');
-          const filename = `icon-${sz}.png`;
-          links.push({ sz, pngUrl, filename });
+          const pngUrl = cv.toDataURL('image/png');
+
+          /* Preview image */
+          const prev = document.getElementById(`prev${sz}`);
+          prev.src   = pngUrl;
+
+          /* Download link */
+          const dl   = document.getElementById(`dl${sz}`);
+          dl.href    = pngUrl;
+
+          oks.push(sz);
         });
 
         URL.revokeObjectURL(url);
-        preview.innerHTML = '';
 
-        links.forEach(({ sz, pngUrl, filename }) => {
-          const div = document.createElement('div');
-          div.className = 'icon-item';
-          div.innerHTML = `
-            <img src="${pngUrl}" width="${sz > 192 ? 128 : sz}" height="${sz > 192 ? 128 : sz}" alt="${filename}">
-            <p>${sz}×${sz}</p>
-            <a class="dl-link" href="${pngUrl}" download="${filename}">⬇ Download ${filename}</a>
-          `;
-          preview.appendChild(div);
-        });
+        if (oks.length === 2) {
+          results.classList.add('show');
+          status.textContent = '✅ Icon berhasil dibuat! Klik Download di bawah.';
+          status.className   = 'status ok';
+          btn.textContent    = '🔄 Generate Ulang';
+          btn.disabled       = false;
+        }
 
-        const note = document.createElement('div');
-        note.style.cssText = 'width:100%;color:#888;font-size:12px;margin-top:10px;';
-        note.textContent   = 'Save both files into assets/icons/ then deploy.';
-        preview.appendChild(note);
-      };
+      } catch (err) {
+        onError('Canvas error: ' + err.message);
+      }
+    };
 
-      img.onerror = () => {
-        preview.innerHTML = '<p style="color:#FF4444">Could not load icon.svg — run this from a local server or GitHub Pages.</p>';
-      };
+    img.onerror = () => onError('Gagal load SVG. Coba browser Chrome atau Edge.');
 
-      img.src = url;
-    }
-  </script>
+    img.src = url;
+
+  } catch (err) {
+    onError('Error: ' + err.message);
+  }
+}
+
+function onError(msg) {
+  const btn    = document.getElementById('btn');
+  const status = document.getElementById('status');
+  status.textContent = '❌ ' + msg;
+  status.className   = 'status err';
+  btn.textContent    = '🎨 Coba Lagi';
+  btn.disabled       = false;
+}
+</script>
+
 </body>
 </html>

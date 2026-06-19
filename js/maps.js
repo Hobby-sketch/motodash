@@ -75,6 +75,13 @@ class MapsModule {
         /* Stop auto-follow when user drags map */
         this.map.on('dragstart', () => { this.isFollowing = false; });
 
+        /*
+         * FIX: Call invalidateSize after a short delay to ensure the container
+         * has been painted by the browser before Leaflet measures it.
+         * Also called again by switchPanel() on every panel activation.
+         */
+        setTimeout(() => this.map.invalidateSize(), 200);
+
         this._setupSearch();
         this._setupToolbarButtons();
         this._subscribeGPS();
@@ -183,7 +190,12 @@ class MapsModule {
         try {
             const url = `https://nominatim.openstreetmap.org/search` +
                         `?q=${encodeURIComponent(q)}&format=json&limit=6&addressdetails=1`;
-            const resp    = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            const resp    = await fetch(url, {
+                headers: {
+                    'Accept'    : 'application/json',
+                    'User-Agent': 'MotoDash/1.0 (https://github.com/motodash)'
+                }
+            });
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const results = await resp.json();
             this._searchResults = results;
@@ -321,11 +333,20 @@ class MapsModule {
             this.isNavigating = false;
         });
 
-        /* Hide LRM's own panel */
+        /*
+         * FIX: Hide LRM's own panel with retry limit.
+         * Without a limit, if LRM never renders (offline/error),
+         * the recursive setTimeout runs forever causing CPU leak.
+         */
+        let hideRetries = 0;
         const hidePanel = () => {
             const lrm = document.querySelector('.leaflet-routing-container');
-            if (lrm) lrm.style.display = 'none';
-            else setTimeout(hidePanel, 200);
+            if (lrm) {
+                lrm.style.display = 'none';
+            } else if (hideRetries++ < 20) {
+                setTimeout(hidePanel, 200);
+            }
+            // Stop after 20 retries (4 seconds) — LRM may not have rendered
         };
         hidePanel();
     }
@@ -405,7 +426,12 @@ class MapsModule {
     async navigateTo(query) {
         try {
             const url  = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
-            const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            const resp = await fetch(url, {
+                headers: {
+                    'Accept'    : 'application/json',
+                    'User-Agent': 'MotoDash/1.0 (https://github.com/motodash)'
+                }
+            });
             const data = await resp.json();
             if (data.length) {
                 this._selectDestination(+data[0].lat, +data[0].lon, data[0].display_name);
