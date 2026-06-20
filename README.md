@@ -13,12 +13,13 @@
 motodash/
 ├── index.html              # Main dashboard UI
 ├── manifest.json           # PWA manifest (installable)
-├── sw.js                   # Service Worker (offline cache)
+├── sw.js                   # Service Worker (offline cache, TTL rules)
 ├── generate-icons.html     # Helper: generate PNG icons from SVG
 ├── .nojekyll               # Required for GitHub Pages
 │
 ├── css/
-│   └── style.css           # Complete premium dark theme
+│   ├── style.css           # Complete premium dark theme
+│   └── fonts.css           # Self-hosted @font-face declarations
 │
 ├── js/
 │   ├── utilities.js        # Haversine, EventBus, Storage, formatters, GPX
@@ -27,8 +28,14 @@ motodash/
 │   ├── maps.js             # Leaflet.js, OSM tiles, Nominatim, OSRM routing
 │   ├── bluetooth.js        # Web Bluetooth API, device list, battery level
 │   ├── voice.js            # Web Speech API, command parsing, TTS
-│   ├── media.js            # Media Session API controls
+│   ├── media.js            # Internal HTML5 audio player + Media Session API
 │   └── app.js              # Main controller: panels, clock, settings, PWA
+│
+├── vendor/                 # Self-hosted third-party libraries (NOT CDN)
+│   ├── leaflet/                     # Leaflet 1.9.4 (map engine)
+│   ├── leaflet-routing-machine/     # Routing Machine 3.2.12 (turn-by-turn)
+│   ├── jsmediatags/                 # ID3 tag reader for music player
+│   └── fonts/                       # Orbitron, Rajdhani, Share Tech Mono (woff2)
 │
 └── assets/
     └── icons/
@@ -36,6 +43,77 @@ motodash/
         ├── icon-192.png    # (generate with generate-icons.html)
         └── icon-512.png    # (generate with generate-icons.html)
 ```
+
+> ⚠️ The `vendor/` folder **must** be uploaded to GitHub along with everything
+> else — it is part of the application, not a build artifact. Without it,
+> the map and music features will not work.
+
+---
+
+## 🔒 Security & Privacy
+
+This app is hardened to minimize third-party trust and give you explicit
+control over every domain it talks to.
+
+### Self-hosted, zero CDN dependency
+Every static library (Leaflet, Leaflet Routing Machine, jsmediatags, and
+all fonts) is vendored under `vendor/` and `css/fonts.css`, served from
+**your own domain** (GitHub Pages). Nothing is loaded from `unpkg.com`,
+`cdnjs.cloudflare.com`, or `fonts.googleapis.com`. This removes an entire
+class of bugs (e.g. a CDN going down, or a corrupted integrity hash
+silently blocking a script) and removes every third party that could
+otherwise see your visitors' IP address on every page load.
+
+### Explicit destination allow-list (Content-Security-Policy)
+`index.html` declares a strict CSP that blocks **any** domain not on the
+list below. Only 3 domains are reachable, and only because they are live
+data services that cannot be self-hosted as static files:
+
+| Domain | Why it's needed | Can it be self-hosted? |
+|---|---|---|
+| `nominatim.openstreetmap.org` | Address/place search results | ❌ Live geocoding service |
+| `router.project-osrm.org` | Turn-by-turn route calculation | ❌ Live routing service |
+| `*.basemaps.cartocdn.com` | Map tile images | ❌ Live tile rendering service |
+
+Every other resource — scripts, styles, fonts — is restricted to `'self'`
+(your own domain only) via `script-src 'self'`, `font-src 'self'`, etc.
+
+### Cache rules with explicit expiry (TTL)
+`sw.js` no longer caches anything indefinitely. Each cache type has its
+own rule:
+
+| Cache | Strategy | TTL |
+|---|---|---|
+| App shell (HTML/CSS/JS, vendor libs, fonts) | Stale-While-Revalidate | versioned via `CACHE_VERSION` |
+| Map tiles | Cache-First | 7 days |
+| Nominatim search results | Network-First | 1 hour |
+| OSRM routes | Network-Only | never cached |
+
+Bump `CACHE_VERSION` in `sw.js` on any deploy that changes cached files —
+old caches are purged automatically on activate.
+
+### Cookie policy
+This app **never sets a cookie**. All local state (trip data, GPS
+calibration, riding mode, settings) lives exclusively in `localStorage`,
+which never leaves the browser and is never sent over the network. Since
+every script/style/font is self-hosted, no third party has any
+opportunity to set a cookie on this page either.
+
+### (Optional) Use your own custom domain
+GitHub Pages lets you front the site with a domain you own and control,
+instead of `username.github.io`:
+
+1. Add a `CNAME` file at the repo root containing just your domain, e.g.:
+   ```
+   motodash.yourdomain.com
+   ```
+2. At your DNS provider, add a `CNAME` record pointing
+   `motodash.yourdomain.com` → `username.github.io`
+3. GitHub repo → Settings → Pages → **Custom domain** → enter the same
+   domain → **Enforce HTTPS** ✅
+
+This gives you full control over the domain itself (DNS, certificate
+monitoring, CAA records) on top of the app-level controls above.
 
 ---
 

@@ -282,7 +282,7 @@ class MapsModule {
          * early with a clear message instead of a silent crash.
          */
         if (typeof L.Routing === 'undefined') {
-            console.error('[Maps] FATAL: L.Routing is not defined. leaflet-routing-machine.js failed to load.');
+            console.error('[Maps] FATAL: L.Routing is not defined. vendor/leaflet-routing-machine/leaflet-routing-machine.js failed to load.');
             Utils.showToast('Fitur navigasi gagal dimuat — coba refresh halaman', 'error', 5000);
             this.isNavigating = false;
             return;
@@ -527,15 +527,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             Peta gagal dimuat
                         </div>
                         <div style="font-size:13px;color:#7A9BB5;max-width:320px;line-height:1.6;">
-                            Library Leaflet tidak berhasil di-load dari CDN.
-                            Cek koneksi internet, matikan ad-blocker, atau coba
-                            refresh halaman. Jika masalah berlanjut, buka
-                            Console (F12) untuk detail error.
+                            File vendor/leaflet/leaflet.js tidak berhasil dimuat.
+                            Pastikan folder <code>vendor/</code> ikut ter-upload ke
+                            GitHub. Cek juga Console (F12) untuk detail error.
                         </div>
                     </div>`;
             }
-            console.error('[Maps] FATAL: Leaflet (L) is not defined. CDN script failed to load.');
-            Utils.showToast?.('Peta gagal dimuat — cek koneksi internet', 'error', 6000);
+            console.error('[Maps] FATAL: Leaflet (L) is not defined. vendor/leaflet/leaflet.js failed to load — check that the vendor/ folder was deployed.');
+            Utils.showToast?.('Peta gagal dimuat — cek folder vendor/', 'error', 6000);
             return; // Do not attempt to construct MapsModule — it will throw
         }
 

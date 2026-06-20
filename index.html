@@ -2,6 +2,57 @@
 <html lang="en" data-theme="dark" data-time="night">
 <head>
   <meta charset="UTF-8">
+
+  <!--
+    ════════════════════════════════════════════════════════════════
+    CONTENT-SECURITY-POLICY — explicit allow-list for source & destination
+    ════════════════════════════════════════════════════════════════
+    Everything is 'self' (this domain only) EXCEPT 3 live data APIs that
+    cannot be self-hosted because they are dynamic services, not static
+    files:
+      - nominatim.openstreetmap.org  → address/place search (geocoding)
+      - router.project-osrm.org      → turn-by-turn route calculation
+      - *.basemaps.cartocdn.com      → map tile images (a/b/c/d subdomains)
+    No other domain — third-party or otherwise — is permitted to load
+    scripts, styles, fonts, or receive connections from this page.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https://*.basemaps.cartocdn.com;
+    font-src 'self';
+    connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.basemaps.cartocdn.com;
+    worker-src 'self';
+    manifest-src 'self';
+    base-uri 'self';
+    form-action 'self';
+    object-src 'none';
+    upgrade-insecure-requests;
+  ">
+  <!--
+    NOTE: 'frame-ancestors' is intentionally omitted above — browsers
+    ignore that directive when delivered via <meta> (it only works via
+    a real HTTP response header, which GitHub Pages' static hosting
+    cannot set). If you migrate to a host that lets you set custom
+    HTTP headers, add a response header instead:
+      Content-Security-Policy: frame-ancestors 'none'
+  -->
+
+  <!-- Privacy: don't leak full URL/query string to any external link clicked from this page -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!--
+    COOKIE POLICY (documented, not a header — GitHub Pages serves static
+    files and cannot set HTTP response headers):
+    This application sets NO cookies of any kind. All local state
+    (trip data, GPS calibration, settings, riding mode) is stored
+    exclusively via localStorage, which is same-origin and never sent
+    over the network. Since every script/font/style below is now
+    self-hosted (no third-party CDN), no third-party can set a cookie
+    on this page either.
+  -->
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#050505">
   <meta name="mobile-web-app-capable" content="yes">
@@ -15,17 +66,13 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Fonts — self-hosted, no Google Fonts CDN call -->
+  <link rel="stylesheet" href="css/fonts.css">
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <!-- Leaflet Routing Machine CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
-        integrity="sha256-cu3EeyAbdh7FZ58X4+oQz2g30Tw/U+3Utqmr1ETODqQ=" crossorigin="">
+  <!-- Leaflet — self-hosted, no unpkg.com CDN call -->
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <!-- Leaflet Routing Machine — self-hosted -->
+  <link rel="stylesheet" href="vendor/leaflet-routing-machine/leaflet-routing-machine.css">
 
   <!-- App CSS -->
   <link rel="stylesheet" href="css/style.css">
@@ -750,16 +797,14 @@
 
 
 <!-- ════════════════ SCRIPTS ════════════════ -->
-<!-- Leaflet — SRI hash verified against npm registry authoritative source -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<!-- Leaflet — self-hosted, served from this domain (no third-party CDN) -->
+<script src="vendor/leaflet/leaflet.js"></script>
 
-<!-- Leaflet Routing Machine (uses OSRM, no API key) -->
-<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"
-        integrity="sha256-W+ggQ0MIhtG5LaUrBTtRqUFHT0m9MnTVJqej3K2Pz2A=" crossorigin=""></script>
+<!-- Leaflet Routing Machine — self-hosted (uses OSRM, no API key) -->
+<script src="vendor/leaflet-routing-machine/leaflet-routing-machine.js"></script>
 
-<!-- jsmediatags — read ID3/metadata tags from local audio files (MP3, AAC, etc.) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+<!-- jsmediatags — self-hosted, reads ID3/metadata tags from local audio files -->
+<script src="vendor/jsmediatags/jsmediatags.js"></script>
 
 <!-- Hidden HTML5 audio element — owned by this page, required for Media Session API -->
 <audio id="audio-player" preload="metadata" style="display:none"></audio>
