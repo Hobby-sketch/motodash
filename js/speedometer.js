@@ -1,8 +1,8 @@
 /**
  * MotoDash — speedometer.js
  * GPS Speedometer: watchPosition, Kalman filter, Haversine speed,
- * animated arc gauge, riding modes, DeviceOrientation compass,
- * GPS calibration, vehicle status.
+ * animated arc gauge, DeviceOrientation compass, GPS calibration,
+ * vehicle status.
  */
 
 'use strict';
@@ -13,7 +13,6 @@ class SpeedometerModule {
         this.targetSpeed  = 0;   // Kalman-filtered GPS speed (km/h)
         this.displaySpeed = 0;   // Animated display speed
         this.vehicleStatus = 'STOPPED';
-        this.ridingMode   = 'SPORT';
 
         // ── GPS state ─────────────────────────────────────
         this.watchId      = null;
@@ -26,6 +25,8 @@ class SpeedometerModule {
         this.gpsPosition  = null;   // Exposed to other modules
 
         // ── Kalman filter  (1-D, speed) ───────────────────
+        // Fixed, balanced tuning — smooths GPS noise without lagging
+        // behind real speed changes.
         this.kf = { Q: 0.0001, R: 0.01, P: 1.0, x: 0.0 };
 
         // ── SVG arc geometry ──────────────────────────────
@@ -45,7 +46,6 @@ class SpeedometerModule {
     //  INIT
     // ─────────────────────────────────────────────────────
     _init() {
-        this._loadRidingMode();
         this._setupUI();
         this._startGPS();
         this._startAnimation();
@@ -304,31 +304,6 @@ class SpeedometerModule {
     }
 
     // ─────────────────────────────────────────────────────
-    //  RIDING MODE
-    // ─────────────────────────────────────────────────────
-    setRidingMode(mode) {
-        this.ridingMode = mode;
-        Utils.Storage.set('riding_mode', mode);
-
-        // Tune Kalman responsiveness per mode
-        switch (mode) {
-            case 'ECO':    this.kf.Q = 0.00003; this.kf.R = 0.04; break;
-            case 'NORMAL': this.kf.Q = 0.0001;  this.kf.R = 0.01; break;
-            case 'SPORT':  this.kf.Q = 0.0004;  this.kf.R = 0.004; break;
-        }
-
-        document.querySelectorAll('.riding-mode-btn').forEach(b =>
-            b.classList.toggle('active', b.dataset.mode === mode)
-        );
-        Utils.showToast(`Mode: ${mode}`, 'success');
-        Utils.EventBus.emit('mode:change', { mode });
-    }
-
-    _loadRidingMode() {
-        this.setRidingMode(Utils.Storage.get('riding_mode', 'SPORT'));
-    }
-
-    // ─────────────────────────────────────────────────────
     //  GPS CALIBRATION
     // ─────────────────────────────────────────────────────
     saveCalibration() {
@@ -360,9 +335,6 @@ class SpeedometerModule {
     //  UI BINDINGS
     // ─────────────────────────────────────────────────────
     _setupUI() {
-        document.querySelectorAll('.riding-mode-btn').forEach(btn =>
-            btn.addEventListener('click', () => this.setRidingMode(btn.dataset.mode))
-        );
         document.getElementById('save-calibration')
             ?.addEventListener('click', () => this.saveCalibration());
         document.getElementById('reset-calibration')

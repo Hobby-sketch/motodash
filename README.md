@@ -225,12 +225,13 @@ time_delta = currentTimestamp - lastTimestamp
 speed_kmh = (distance / time_delta) * 3600
 ```
 
-### Riding Mode vs Kalman Parameters
-| Mode | Q (process noise) | R (measurement noise) | Behavior |
-|------|-------------------|----------------------|----------|
-| ECO | 0.00003 | 0.04 | Very smooth, slow response |
-| NORMAL | 0.0001 | 0.01 | Balanced |
-| SPORT | 0.0004 | 0.004 | Fast response, less filtering |
+### Kalman Filter Tuning
+Filter menggunakan parameter tetap yang sudah diseimbangkan (`Q=0.0001, R=0.01`)
+— cukup halus untuk mengurangi noise GPS, namun tetap responsif terhadap
+perubahan kecepatan nyata. Tidak ada mode berkendara (ECO/NORMAL/SPORT)
+karena dashboard ini **tidak terhubung ke mesin/ECU motor** — hanya
+membaca GPS, sehingga "riding mode" semacam itu hanya kosmetik dan
+berpotensi menyesatkan pengguna.
 
 ---
 
@@ -298,15 +299,22 @@ Contoh: jika GPS selalu 10 meter ke selatan, masukkan lat offset +0.0001
 
 ---
 
-## 📊 Trip Computer
+## 📊 Trip Meter
 
-Data yang dicatat:
+Tampil langsung di panel kiri (di bawah kompas), data yang dicatat:
 - **TRIP**: Total jarak perjalanan (km)
 - **AVG**: Rata-rata kecepatan saat bergerak (> 3 km/h)
 - **MAX**: Kecepatan tertinggi tercatat
 - **TIME**: Durasi perjalanan (jam:menit:detik)
 
 Data otomatis disimpan ke LocalStorage setiap 30 detik.
+
+### Reset Trip
+Tombol **↺ RESET** tersedia langsung di header widget Trip Meter (panel
+kiri) — tidak perlu masuk ke Settings. Klik tombol tersebut, konfirmasi
+dialog akan muncul untuk mencegah penghapusan data tidak sengaja.
+Tombol Reset Trip yang sama juga masih tersedia di **Settings → TRIP
+COMPUTER** sebagai akses alternatif.
 
 ### Export GPX
 1. **Settings → TRIP COMPUTER → Export GPX**

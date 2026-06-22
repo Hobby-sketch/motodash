@@ -204,34 +204,6 @@ html, body {
     box-shadow:0 0 12px rgba(0,255,102,.18);
 }
 
-/* ── Riding Mode ── */
-#riding-mode-selector {
-    display:flex; gap:5px; width:100%; padding:0 2px;
-}
-.riding-mode-btn {
-    flex:1; padding:5px 2px; border-radius:4px; cursor:pointer;
-    font-family:var(--f-display); font-size:8px; font-weight:700;
-    letter-spacing:1px; border:1px solid transparent;
-    background:rgba(255,255,255,.03); color:var(--clr-muted);
-    transition:all .25s var(--ease);
-}
-.riding-mode-btn:active { transform:scale(.96); }
-.riding-mode-btn.eco        { border-color:rgba(0,255,102,.15); }
-.riding-mode-btn.eco.active {
-    background:rgba(0,255,102,.12); border-color:var(--clr-secondary);
-    color:var(--clr-secondary); box-shadow:0 0 10px rgba(0,255,102,.25);
-}
-.riding-mode-btn.normal        { border-color:rgba(0,174,239,.15); }
-.riding-mode-btn.normal.active {
-    background:rgba(0,174,239,.12); border-color:var(--clr-primary);
-    color:var(--clr-primary); box-shadow:0 0 10px rgba(0,174,239,.25);
-}
-.riding-mode-btn.sport        { border-color:rgba(255,100,0,.15); }
-.riding-mode-btn.sport.active {
-    background:rgba(255,100,0,.12); border-color:#FF6400;
-    color:#FF6400; box-shadow:0 0 10px rgba(255,100,0,.25);
-}
-
 /* ── Info Panel ── */
 .info-panel {
     width:100%; background:var(--bg-panel);
@@ -259,6 +231,27 @@ html, body {
     width:100%; height:100%;
     filter:drop-shadow(0 0 5px rgba(0,174,239,.4));
 }
+
+/* ── Trip Panel Header + Reset Button ── */
+.trip-panel-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:5px; padding-bottom:5px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+.trip-panel-title {
+    font-family:var(--f-mono); font-size:8px;
+    color:var(--clr-muted); letter-spacing:2px;
+}
+.trip-reset-btn {
+    display:flex; align-items:center; gap:3px;
+    padding:3px 7px; border-radius:4px; cursor:pointer;
+    background:rgba(255,68,68,.06); border:1px solid rgba(255,68,68,.22);
+    color:rgba(255,120,120,.85);
+    font-family:var(--f-mono); font-size:8px; letter-spacing:1px;
+    transition:all .2s var(--ease);
+}
+.trip-reset-btn:hover  { background:rgba(255,68,68,.16); border-color:var(--clr-danger); color:var(--clr-danger); }
+.trip-reset-btn:active { transform:scale(.94); }
 
 /* ── Trip Grid ── */
 .trip-grid {

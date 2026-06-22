@@ -174,13 +174,6 @@
         <div id="vehicle-status" class="vehicle-status stopped">● STOPPED</div>
       </div>
 
-      <!-- Riding Mode Selector -->
-      <div id="riding-mode-selector">
-        <button class="riding-mode-btn eco"    data-mode="ECO">ECO</button>
-        <button class="riding-mode-btn normal" data-mode="NORMAL">NORMAL</button>
-        <button class="riding-mode-btn sport active" data-mode="SPORT">SPORT</button>
-      </div>
-
       <!-- GPS Info -->
       <div id="gps-info-panel" class="info-panel">
         <div class="info-row">
@@ -232,6 +225,17 @@
 
       <!-- Trip Summary -->
       <div id="trip-panel" class="info-panel">
+        <div class="trip-panel-header">
+          <span class="trip-panel-title">TRIP METER</span>
+          <button id="trip-reset-btn" class="trip-reset-btn" title="Reset Trip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+            </svg>
+            <span>RESET</span>
+          </button>
+        </div>
         <div class="trip-grid">
           <div class="trip-item">
             <span class="trip-label">TRIP</span>

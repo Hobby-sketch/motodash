@@ -23,7 +23,20 @@ class TripComputer {
 
         this._loadState();
         this._startTimer();
+        this._setupUI();
         console.log('[TripComputer] Initialized ✓');
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  UI BINDINGS
+    // ─────────────────────────────────────────────────────
+    _setupUI() {
+        document.getElementById('trip-reset-btn')
+            ?.addEventListener('click', () => {
+                if (confirm('Reset semua data trip (jarak, rata-rata, kecepatan maks, durasi)?')) {
+                    this.reset();
+                }
+            });
     }
 
     // ─────────────────────────────────────────────────────
