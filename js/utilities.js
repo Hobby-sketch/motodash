@@ -193,6 +193,17 @@ function setEl(id, value) {
     if (el) el.textContent = value;
 }
 
+/**
+ * Read the current computed value of a CSS custom property (e.g. '--clr-primary').
+ * Used by JS-drawn elements (Leaflet markers, route lines, canvas/SVG colors)
+ * so they stay correct across color themes and day/night mode without
+ * hardcoding hex values that would otherwise go stale when the theme changes.
+ */
+function getCSSVar(name, fallback = '') {
+    const val = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return val ? val.trim() : fallback;
+}
+
 // ═══════════════════════════════════════════════════════════
 //  GLOBAL EXPORT
 // ═══════════════════════════════════════════════════════════
@@ -209,7 +220,8 @@ window.Utils = {
     getCurrentDate,
     generateGPX,
     downloadFile,
-    $, $$, setEl
+    $, $$, setEl,
+    getCSSVar
 };
 
 console.log('[Utils] Loaded ✓');

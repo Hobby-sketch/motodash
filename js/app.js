@@ -169,17 +169,31 @@ class MotoDash {
     //  SETTINGS
     // ─────────────────────────────────────────────────────
     _loadSettings() {
-        return Utils.Storage.get('app_settings', {
+        const defaults = {
             brightness  : 100,
             autoTheme   : true,
-            highAccuracy: true
-        });
+            highAccuracy: true,
+            colorTheme  : 'cyber',
+            timeMode    : 'night'
+        };
+        // Merge with defaults so users upgrading from an older version
+        // (whose saved settings predate colorTheme/timeMode) still get
+        // valid values instead of undefined.
+        return { ...defaults, ...Utils.Storage.get('app_settings', {}) };
     }
 
     _saveSettings() { Utils.Storage.set('app_settings', this.settings); }
 
     _applySettings() {
         document.body.style.filter = `brightness(${this.settings.brightness}%)`;
+        document.documentElement.setAttribute('data-color-theme', this.settings.colorTheme);
+
+        // If auto day/night is off, restore the user's last manual choice
+        // immediately (otherwise the page would sit at whatever static
+        // default is in the HTML, ignoring their saved preference).
+        if (!this.settings.autoTheme) {
+            document.documentElement.setAttribute('data-time', this.settings.timeMode);
+        }
     }
 
     _setupSettingsUI() {
@@ -202,8 +216,23 @@ class MotoDash {
             autoTheme.addEventListener('change', () => {
                 this.settings.autoTheme = autoTheme.checked;
                 this._saveSettings();
+                this._applyAutoTheme(); // re-engage time-based switching immediately
             });
         }
+
+        /* Color Theme swatches (Cyber / Inferno / Purple) — sync active
+         * state to loaded settings, since the HTML default may not match
+         * what the user previously chose. */
+        document.querySelectorAll('.theme-swatch').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === this.settings.colorTheme);
+            btn.addEventListener('click', () => this.setColorTheme(btn.dataset.theme));
+        });
+
+        /* Manual Day / Night override buttons — same sync logic */
+        document.querySelectorAll('.daynight-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.time === this.settings.timeMode);
+            btn.addEventListener('click', () => this.setTimeMode(btn.dataset.time, true));
+        });
 
         /* High GPS accuracy toggle */
         const hiAcc = document.getElementById('high-accuracy-toggle');
@@ -246,16 +275,59 @@ class MotoDash {
     }
 
     // ─────────────────────────────────────────────────────
-    //  AUTO DAY / NIGHT THEME
+    //  COLOR THEME  (Cyber / Inferno / Purple)
+    // ─────────────────────────────────────────────────────
+    setColorTheme(theme) {
+        this.settings.colorTheme = theme;
+        document.documentElement.setAttribute('data-color-theme', theme);
+
+        document.querySelectorAll('.theme-swatch').forEach(b =>
+            b.classList.toggle('active', b.dataset.theme === theme)
+        );
+
+        this._saveSettings();
+        Utils.showToast(`Theme: ${theme.toUpperCase()}`, 'success');
+    }
+
+    // ─────────────────────────────────────────────────────
+    //  DAY / NIGHT THEME — auto (by time) or manual override
     // ─────────────────────────────────────────────────────
     _applyAutoTheme() {
         const apply = () => {
             if (!this.settings.autoTheme) return;
             const h = new Date().getHours();
-            document.documentElement.setAttribute('data-time', (h >= 6 && h < 19) ? 'day' : 'night');
+            const mode = (h >= 6 && h < 19) ? 'day' : 'night';
+            document.documentElement.setAttribute('data-time', mode);
+            document.querySelectorAll('.daynight-btn').forEach(b =>
+                b.classList.toggle('active', b.dataset.time === mode)
+            );
         };
         apply();
-        setInterval(apply, 60_000);
+        if (this._autoThemeInterval) clearInterval(this._autoThemeInterval);
+        this._autoThemeInterval = setInterval(apply, 60_000);
+    }
+
+    /**
+     * Manually force Day or Night mode. Called by the DAY/NIGHT buttons
+     * in Settings. Automatically disables "Auto Day/Night" so the manual
+     * choice isn't immediately overwritten by the time-based check.
+     */
+    setTimeMode(mode, fromManualClick = false) {
+        this.settings.timeMode = mode;
+        document.documentElement.setAttribute('data-time', mode);
+
+        document.querySelectorAll('.daynight-btn').forEach(b =>
+            b.classList.toggle('active', b.dataset.time === mode)
+        );
+
+        if (fromManualClick) {
+            this.settings.autoTheme = false;
+            const autoToggle = document.getElementById('auto-theme-toggle');
+            if (autoToggle) autoToggle.checked = false;
+            Utils.showToast(`${mode === 'day' ? '☀ Day' : '🌙 Night'} mode`, 'success');
+        }
+
+        this._saveSettings();
     }
 
     // ─────────────────────────────────────────────────────

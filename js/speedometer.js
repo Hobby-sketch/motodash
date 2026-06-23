@@ -244,10 +244,13 @@ class SpeedometerModule {
             const offset = this.ARC_CIRCUM * (1 - pct);
             arcEl.style.strokeDashoffset = offset.toFixed(1);
 
-            // Arc colour matches speed range
-            if (spd >= 140)      arcEl.style.stroke = '#FF4444';
-            else if (spd >= 100) arcEl.style.stroke = '#FFAA00';
-            else                 arcEl.style.stroke = '#00AEEF';
+            // Arc colour matches speed range — via CSS class (theme-reactive)
+            // instead of inline style, so it follows the active color theme
+            // and day/night mode automatically.
+            arcEl.classList.remove('speed-arc-normal', 'speed-arc-warning', 'speed-arc-danger');
+            if (spd >= 140)      arcEl.classList.add('speed-arc-danger');
+            else if (spd >= 100) arcEl.classList.add('speed-arc-warning');
+            else                 arcEl.classList.add('speed-arc-normal');
         }
     }
 

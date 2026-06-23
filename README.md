@@ -285,6 +285,32 @@ berpotensi menyesatkan pengguna.
 
 ---
 
+## 🎨 Color Theme &amp; Day/Night Mode
+
+MotoDash mendukung 3 tema warna dan mode tampilan siang/malam, keduanya
+bisa dikombinasikan bebas (misal: tema Purple + Day Mode sekaligus).
+
+### Color Theme
+**Settings → DISPLAY → Color Theme** — pilih salah satu:
+| Tema | Warna Utama | Karakter |
+|---|---|---|
+| **CYBER** (default) | Cyan + Hijau | Futuristik, klasik MotoDash |
+| **INFERNO** | Oranye + Amber | Agresif, sporty |
+| **PURPLE** | Ungu + Cyan | Premium, mewah |
+
+Pilihan tersimpan otomatis dan tetap aktif setiap kali aplikasi dibuka.
+
+### Day / Night Mode
+**Settings → DISPLAY → Auto Day/Night**:
+- **ON** (default): otomatis beralih — Day mode jam 06:00–19:00, Night mode di luar itu
+- **OFF**: kontrol manual via tombol **☀ DAY** / **🌙 NIGHT** di bawahnya
+
+Klik tombol DAY/NIGHT manual akan otomatis menonaktifkan Auto. Catatan:
+peta tetap menggunakan tema gelap (CartoDB Dark) di kedua mode — hanya
+UI di sekitarnya (panel kiri, toolbar, dock) yang berubah terang/gelap.
+
+---
+
 ## ⚙️ GPS Calibration
 
 Digunakan jika posisi GPS tidak akurat atau ada offset sistematis:

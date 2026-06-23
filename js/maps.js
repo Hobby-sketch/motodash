@@ -96,13 +96,13 @@ class MapsModule {
     _motoIconHTML(heading = 0) {
         return `<div class="moto-marker-wrap" style="transform:rotate(${heading}deg)">
           <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="22" cy="22" r="20" fill="rgba(0,174,239,0.18)" stroke="#00AEEF" stroke-width="2"/>
+            <circle cx="22" cy="22" r="20" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="2"/>
             <!-- Arrow head -->
-            <polygon points="22,6 28,34 22,29 16,34" fill="#00AEEF"/>
+            <polygon points="22,6 28,34 22,29 16,34" fill="currentColor"/>
             <!-- Centre dot -->
             <circle cx="22" cy="22" r="4" fill="#FFFFFF" opacity="0.9"/>
             <!-- Accuracy pulse -->
-            <circle cx="22" cy="22" r="8" fill="none" stroke="#00AEEF"
+            <circle cx="22" cy="22" r="8" fill="none" stroke="currentColor"
                     stroke-width="1" opacity="0.4" class="moto-pulse"/>
           </svg>
         </div>`;
@@ -308,7 +308,7 @@ class MapsModule {
             fitSelectedRoutes  : false,
             lineOptions: {
                 styles: [
-                    { color: '#00AEEF', opacity: 0.85, weight: 6 },
+                    { color: Utils.getCSSVar('--clr-primary', '#00AEEF'), opacity: 0.85, weight: 6 },
                     { color: '#005577', opacity: 0.4,  weight: 12 }
                 ],
                 extendToWaypoints     : true,
