@@ -47,11 +47,37 @@ class SpeedometerModule {
     // ─────────────────────────────────────────────────────
     _init() {
         this._setupUI();
+        this._generateDialTicks();
         this._startGPS();
         this._startAnimation();
         this._setupCompass();
         this._loadCalibrationUI();
         console.log('[Speedometer] Initialized ✓');
+    }
+
+    /**
+     * Generate tick marks for the Inferno-theme semi-circle needle dial.
+     * Built once via JS rather than hand-written in HTML — 11 ticks
+     * (every 20 km/h, 0–200) around a 180° arc centred at (100,105) r=85.
+     */
+    _generateDialTicks() {
+        const g = document.getElementById('dial-ticks');
+        if (!g) return;
+        const cx = 100, cy = 105, rOuter = 85, rInnerMinor = 73, rInnerMajor = 68;
+        const steps = 10; // 11 ticks total (0..10)
+        let svg = '';
+        for (let i = 0; i <= steps; i++) {
+            const angleDeg = 180 - (i / steps) * 180; // 180°→0°, left to right
+            const rad = (angleDeg * Math.PI) / 180;
+            const isMajor = i % 2 === 0; // every 40 km/h slightly longer
+            const rInner = isMajor ? rInnerMajor : rInnerMinor;
+            const x1 = cx + rOuter * Math.cos(rad);
+            const y1 = cy - rOuter * Math.sin(rad);
+            const x2 = cx + rInner * Math.cos(rad);
+            const y2 = cy - rInner * Math.sin(rad);
+            svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="${isMajor ? 'dial-tick-major' : 'dial-tick'}"/>`;
+        }
+        g.innerHTML = svg;
     }
 
     // ─────────────────────────────────────────────────────
@@ -223,34 +249,82 @@ class SpeedometerModule {
     }
 
     // ─────────────────────────────────────────────────────
-    //  RENDER
+    //  RENDER — drives all 3 speed faces simultaneously.
+    //  CSS shows only the one matching the active color theme; updating
+    //  all three unconditionally is cheap and avoids JS branching on
+    //  which theme is active.
     // ─────────────────────────────────────────────────────
     _renderSpeed() {
         const spd = Math.round(this.displaySpeed);
+        const zone = spd >= 140 ? 'danger' : (spd >= 100 ? 'warning' : 'normal');
+
+        this._renderFaceRing(spd, zone);
+        this._renderFaceDial(spd, zone);
+        this._renderFaceFlat(spd, zone);
+    }
+
+    /* ── FACE 1: Cyber ring ──────────────────────────────── */
+    _renderFaceRing(spd, zone) {
         const valEl = document.getElementById('speed-value');
         const arcEl = document.getElementById('speed-arc-fill');
 
-        // Numeric display + colour
         if (valEl) {
             valEl.textContent = spd;
             valEl.className   = 'speed-value';
-            if (spd >= 140) { valEl.classList.add('speed-danger');  }
-            else if (spd >= 100) { valEl.classList.add('speed-warning'); }
+            if (zone === 'danger')       valEl.classList.add('speed-danger');
+            else if (zone === 'warning') valEl.classList.add('speed-warning');
         }
 
-        // Arc progress (stroke-dashoffset)
         if (arcEl) {
             const pct    = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
             const offset = this.ARC_CIRCUM * (1 - pct);
             arcEl.style.strokeDashoffset = offset.toFixed(1);
 
-            // Arc colour matches speed range — via CSS class (theme-reactive)
-            // instead of inline style, so it follows the active color theme
-            // and day/night mode automatically.
             arcEl.classList.remove('speed-arc-normal', 'speed-arc-warning', 'speed-arc-danger');
-            if (spd >= 140)      arcEl.classList.add('speed-arc-danger');
-            else if (spd >= 100) arcEl.classList.add('speed-arc-warning');
-            else                 arcEl.classList.add('speed-arc-normal');
+            arcEl.classList.add(`speed-arc-${zone}`);
+        }
+    }
+
+    /* ── FACE 2: Inferno needle dial ─────────────────────── */
+    _renderFaceDial(spd, zone) {
+        const valEl    = document.getElementById('speed-value-dial');
+        const needleEl = document.getElementById('speed-needle');
+
+        if (valEl) {
+            valEl.textContent = spd;
+        }
+
+        if (needleEl) {
+            // 0 km/h → 180° (pointing left), 200 km/h → 0° (pointing right)
+            const pct   = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+            const angle = 180 - pct * 180;
+            needleEl.setAttribute('transform', `rotate(${angle.toFixed(1)} 100 105)`);
+
+            needleEl.classList.remove('needle-warning', 'needle-danger');
+            if (zone === 'danger')       needleEl.classList.add('needle-danger');
+            else if (zone === 'warning') needleEl.classList.add('needle-warning');
+        }
+    }
+
+    /* ── FACE 3: Purple flat minimal ──────────────────────── */
+    _renderFaceFlat(spd, zone) {
+        const valEl = document.getElementById('speed-value-flat');
+        const barEl = document.getElementById('speed-bar-fill');
+
+        if (valEl) {
+            valEl.className = 'flat-value';
+            if (zone === 'danger')       valEl.classList.add('speed-danger');
+            else if (zone === 'warning') valEl.classList.add('speed-warning');
+            valEl.textContent = spd;
+        }
+
+        if (barEl) {
+            const pct = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1) * 100;
+            barEl.style.width = `${pct.toFixed(1)}%`;
+
+            barEl.classList.remove('bar-warning', 'bar-danger');
+            if (zone === 'danger')       barEl.classList.add('bar-danger');
+            else if (zone === 'warning') barEl.classList.add('bar-warning');
         }
     }
 

@@ -759,14 +759,13 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
     <h3>GPS Speedometer (Panel Kiri — Otomatis)</h3>
   </div>
   <div class="step-body">
-    <p style="color:var(--dim);margin-bottom:12px">Langsung aktif saat aplikasi dibuka. Tidak perlu pengaturan apapun.</p>
+    <p style="color:var(--dim);margin-bottom:12px">Langsung aktif saat aplikasi dibuka. Tidak perlu pengaturan apapun. Bentuk tampilannya berbeda tergantung Color Theme yang dipilih (lihat bagian "Ganti Tema" di bawah).</p>
     <div class="tw"><table>
       <tr><th>Yang Terlihat</th><th>Artinya</th></tr>
       <tr><td>Angka besar (km/h)</td><td>Kecepatan kendaraan saat ini dari GPS</td></tr>
       <tr><td>● MOVING / STOPPED</td><td>Status bergerak atau berhenti</td></tr>
       <tr><td>GPS SEARCHING</td><td>Menunggu sinyal — perlu di luar ruangan</td></tr>
       <tr><td>GPS GOOD / EXCELLENT</td><td>Sinyal cukup, siap digunakan</td></tr>
-      <tr><td>TRIP METER (panel kiri)</td><td>Jarak, rata-rata, kecepatan maks, durasi — tap <strong>↺ RESET</strong> untuk hapus data</td></tr>
     </table></div>
   </div>
 </div>
@@ -775,7 +774,7 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
 <div class="step">
   <div class="step-head">
     <div class="num" style="background:rgba(255,215,64,.12);border:2px solid var(--yellow);color:var(--yellow);font-size:18px">🗺</div>
-    <h3>Peta &amp; Navigasi (Tap MAPS di dock bawah)</h3>
+    <h3>Peta, Navigasi &amp; Trip Meter (Tap MAPS di dock bawah)</h3>
   </div>
   <div class="step-body">
     <div class="row">
@@ -795,6 +794,11 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
       <tr><td>Geser peta</td><td>Auto-follow berhenti sementara</td></tr>
       <tr><td>+/− tombol</td><td>Zoom in/out peta</td></tr>
     </table></div>
+
+    <div class="alert info" style="margin-top:10px">
+      <span class="ai">📊</span>
+      <p><strong>Trip Meter</strong> ada di strip bawah peta — menampilkan TRIP / AVG / MAX / TIME. Tap <strong>↺ RESET</strong> di pojok kanan strip untuk hapus data (ada konfirmasi dulu).</p>
+    </div>
   </div>
 </div>
 
@@ -867,13 +871,20 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
     <h3>Ganti Tema &amp; Tampilan (Tap ⚙ SETTINGS di dock bawah)</h3>
   </div>
   <div class="step-body">
-    <p style="color:var(--dim);margin-bottom:12px">MotoDash punya 3 tema warna dan mode siang/malam — bisa digabung bebas.</p>
+    <p style="color:var(--dim);margin-bottom:12px">MotoDash punya 3 tema — masing-masing punya <strong>bentuk speedometer yang benar-benar berbeda</strong>, bukan cuma ganti warna. Maps dan Trip Meter tetap selalu tampil di ketiga tema.</p>
+
+    <table style="margin-bottom:10px">
+      <tr><th>Tema</th><th>Bentuk Speedometer</th></tr>
+      <tr><td><strong>CYBER</strong> (default)</td><td>Ring lingkar penuh dengan angka di tengah</td></tr>
+      <tr><td><strong>INFERNO</strong></td><td>Dial jarum analog setengah lingkar — gaya tachometer mobil sport</td></tr>
+      <tr><td><strong>PURPLE</strong></td><td>Angka flat raksasa + garis bar tipis, tanpa bentuk gauge sama sekali — peta dapat porsi terluas</td></tr>
+    </table>
 
     <div class="row">
       <div class="rn">1</div>
       <div class="rb">
         <b>Pilih Color Theme</b>
-        <p>Tap salah satu: <strong>CYBER</strong> (cyan/hijau, default) · <strong>INFERNO</strong> (oranye/amber) · <strong>PURPLE</strong> (ungu/cyan)</p>
+        <p>Tap salah satu kartu CYBER / INFERNO / PURPLE — tampilan speedometer langsung berubah seketika</p>
       </div>
     </div>
     <div class="row">

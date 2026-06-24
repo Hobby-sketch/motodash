@@ -287,17 +287,22 @@ berpotensi menyesatkan pengguna.
 
 ## 🎨 Color Theme &amp; Day/Night Mode
 
-MotoDash mendukung 3 tema warna dan mode tampilan siang/malam, keduanya
-bisa dikombinasikan bebas (misal: tema Purple + Day Mode sekaligus).
+MotoDash punya 3 tema yang masing-masing tampil dengan **susunan
+speedometer yang benar-benar berbeda** (bukan cuma ganti warna), plus
+mode tampilan siang/malam yang bisa dikombinasikan bebas dengan tema
+apa pun.
 
-### Color Theme
+### Color Theme — 3 susunan dashboard berbeda
 **Settings → DISPLAY → Color Theme** — pilih salah satu:
-| Tema | Warna Utama | Karakter |
-|---|---|---|
-| **CYBER** (default) | Cyan + Hijau | Futuristik, klasik MotoDash |
-| **INFERNO** | Oranye + Amber | Agresif, sporty |
-| **PURPLE** | Ungu + Cyan | Premium, mewah |
 
+| Tema | Gaya Speedometer | Lebar Panel Kiri | Karakter |
+|---|---|---|---|
+| **CYBER** (default) | Ring lingkar penuh, angka di tengah | 35% | Futuristik, klasik |
+| **INFERNO** | Dial jarum analog setengah lingkar + tick mark | 38% | Gaya tachometer mobil sport |
+| **PURPLE** | Angka flat raksasa + bar garis tipis, tanpa bentuk gauge | 30% (peta dapat ruang terbanyak) | Minimalis, ala dashboard EV modern |
+
+Maps, Speedometer, dan Trip Meter tetap selalu tampil di ketiga tema —
+hanya bentuk/susunan speedometer dan proporsi lebar panel yang berubah.
 Pilihan tersimpan otomatis dan tetap aktif setiap kali aplikasi dibuka.
 
 ### Day / Night Mode
@@ -307,7 +312,8 @@ Pilihan tersimpan otomatis dan tetap aktif setiap kali aplikasi dibuka.
 
 Klik tombol DAY/NIGHT manual akan otomatis menonaktifkan Auto. Catatan:
 peta tetap menggunakan tema gelap (CartoDB Dark) di kedua mode — hanya
-UI di sekitarnya (panel kiri, toolbar, dock) yang berubah terang/gelap.
+UI di sekitarnya (panel kiri, toolbar, dock, trip meter) yang berubah
+terang/gelap.
 
 ---
 
@@ -327,7 +333,9 @@ Contoh: jika GPS selalu 10 meter ke selatan, masukkan lat offset +0.0001
 
 ## 📊 Trip Meter
 
-Tampil langsung di panel kiri (di bawah kompas), data yang dicatat:
+Tampil sebagai strip di **bagian bawah panel Maps** (bukan di panel kiri
+lagi) — penempatan ini sengaja dipindah agar Speedometer di panel kiri
+mendapat porsi ukuran yang jauh lebih besar. Data yang dicatat:
 - **TRIP**: Total jarak perjalanan (km)
 - **AVG**: Rata-rata kecepatan saat bergerak (> 3 km/h)
 - **MAX**: Kecepatan tertinggi tercatat
@@ -336,8 +344,8 @@ Tampil langsung di panel kiri (di bawah kompas), data yang dicatat:
 Data otomatis disimpan ke LocalStorage setiap 30 detik.
 
 ### Reset Trip
-Tombol **↺ RESET** tersedia langsung di header widget Trip Meter (panel
-kiri) — tidak perlu masuk ke Settings. Klik tombol tersebut, konfirmasi
+Tombol **↺ RESET** ada langsung di ujung kanan strip Trip Meter (panel
+Maps) — tidak perlu masuk ke Settings. Klik tombol tersebut, konfirmasi
 dialog akan muncul untuk mencegah penghapusan data tidak sengaja.
 Tombol Reset Trip yang sama juga masih tersedia di **Settings → TRIP
 COMPUTER** sebagai akses alternatif.
