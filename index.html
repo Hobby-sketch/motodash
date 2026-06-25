@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-color-theme="cyber" data-time="night">
+<html lang="en" data-color-theme="origin" data-time="night">
 <head>
   <meta charset="UTF-8">
 
@@ -143,61 +143,55 @@
          └─────────────────────────────────┘ -->
     <div id="left-panel">
 
-      <!-- ═══ SPEED FACE 1 — CYBER: Full Ring Gauge ═══ -->
-      <div id="speed-face-cyber" class="speed-face">
-        <div class="speed-ring">
-          <svg class="speed-arc" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="100" cy="100" r="85"
-                    fill="none" stroke="var(--border)" stroke-width="8"
-                    stroke-dasharray="440 94" stroke-linecap="round"
-                    transform="rotate(135 100 100)"/>
-            <circle cx="100" cy="100" r="85" id="speed-arc-fill"
-                    class="speed-arc-normal"
-                    fill="none" stroke-width="8"
-                    stroke-dasharray="534" stroke-dashoffset="534"
-                    stroke-linecap="round"
-                    transform="rotate(135 100 100)"
-                    style="transition:stroke-dashoffset .12s linear, stroke .4s;"/>
-          </svg>
-          <div class="speed-center">
-            <div id="speed-value" class="speed-value">0</div>
-            <div class="speed-unit">km/h</div>
+      <!-- ═══ SPEED FACE 1 — ORIGIN: Segmented Bar + Clean Digital (OEM style) ═══ -->
+      <div id="speed-face-origin" class="speed-face">
+        <div class="origin-gauge">
+          <div class="origin-bar-track" id="origin-bar-track"></div>
+          <div class="origin-readout">
+            <span id="speed-value-origin" class="origin-value">0</span>
+            <span class="origin-unit">km/h</span>
           </div>
         </div>
       </div>
 
-      <!-- ═══ SPEED FACE 2 — INFERNO: Semi-Circle Needle Dial ═══ -->
-      <div id="speed-face-inferno" class="speed-face">
-        <div class="dial-gauge">
-          <svg class="dial-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-            <!-- Track arc (semi-circle, 180°) -->
-            <path d="M 15 105 A 85 85 0 0 1 185 105"
-                  fill="none" stroke="var(--border)" stroke-width="10" stroke-linecap="round"/>
-            <!-- Tick marks every 20 km/h (11 ticks, 0-200) -->
-            <g class="dial-ticks" id="dial-ticks"></g>
-            <!-- Needle -->
-            <g id="speed-needle" transform="rotate(180 100 105)">
-              <line x1="100" y1="105" x2="100" y2="32" class="dial-needle-line"/>
-              <circle cx="100" cy="105" r="7" class="dial-needle-hub"/>
-            </g>
+      <!-- ═══ SPEED FACE 2 — NEXUS: Holographic Concentric Rings ═══ -->
+      <div id="speed-face-nexus" class="speed-face">
+        <div class="nexus-gauge">
+          <svg class="nexus-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+            <circle class="nexus-ring-outer" cx="110" cy="110" r="102"/>
+            <circle class="nexus-ring-mid"   cx="110" cy="110" r="86"/>
+            <g class="nexus-dots" id="nexus-dots"></g>
+            <circle cx="110" cy="110" r="68"
+                    fill="none" stroke="var(--border)" stroke-width="6"/>
+            <circle id="nexus-arc-fill" cx="110" cy="110" r="68"
+                    class="nexus-progress-normal"
+                    fill="none" stroke-width="6" stroke-linecap="round"
+                    stroke-dasharray="427" stroke-dashoffset="427"
+                    transform="rotate(-90 110 110)"/>
           </svg>
-          <div class="dial-readout">
-            <span id="speed-value-dial" class="dial-value">0</span>
-            <span class="dial-unit">km/h</span>
+          <div class="nexus-center">
+            <span id="speed-value-nexus" class="nexus-value">0</span>
+            <span class="nexus-unit">km/h</span>
           </div>
         </div>
       </div>
 
-      <!-- ═══ SPEED FACE 3 — PURPLE: Flat Minimal Digital ═══ -->
-      <div id="speed-face-purple" class="speed-face">
-        <div class="flat-gauge">
-          <div class="flat-readout">
-            <span id="speed-value-flat" class="flat-value">0</span>
-            <span class="flat-unit">km/h</span>
+      <!-- ═══ SPEED FACE 3 — TECHNO: Hexagon Frame + LED Bargraph ═══ -->
+      <div id="speed-face-techno" class="speed-face">
+        <div class="techno-gauge">
+          <svg class="techno-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <polygon class="techno-hex-track"
+                     points="100,8 178,54 178,146 100,192 22,146 22,54"/>
+            <polygon id="techno-hex-fill" class="techno-hex-fill"
+                     points="100,8 178,54 178,146 100,192 22,146 22,54"
+                     fill="none" stroke-width="4"
+                     stroke-dasharray="546" stroke-dashoffset="546"/>
+          </svg>
+          <div class="techno-center">
+            <span id="speed-value-techno" class="techno-value">0</span>
+            <span class="techno-unit">KM/H</span>
           </div>
-          <div class="flat-bar-track">
-            <div id="speed-bar-fill" class="flat-bar-fill"></div>
-          </div>
+          <div class="techno-led-bar" id="techno-led-bar"></div>
         </div>
       </div>
 
@@ -669,20 +663,20 @@
               <label class="setting-label">Color Theme</label>
             </div>
             <div class="theme-swatch-row" id="theme-swatch-row">
-              <button class="theme-swatch active" data-theme="cyber" title="Cyber Blue">
-                <span class="swatch-dot" style="background:#00AEEF"></span>
-                <span class="swatch-dot" style="background:#00FF66"></span>
-                <span class="swatch-label">CYBER</span>
+              <button class="theme-swatch active" data-theme="origin" title="Origin">
+                <span class="swatch-dot" style="background:#3DDBC4"></span>
+                <span class="swatch-dot" style="background:#B8E8DC"></span>
+                <span class="swatch-label">ORIGIN</span>
               </button>
-              <button class="theme-swatch" data-theme="inferno" title="Inferno">
-                <span class="swatch-dot" style="background:#FF5722"></span>
-                <span class="swatch-dot" style="background:#FFC107"></span>
-                <span class="swatch-label">INFERNO</span>
+              <button class="theme-swatch" data-theme="nexus" title="Nexus">
+                <span class="swatch-dot" style="background:#6C8CFF"></span>
+                <span class="swatch-dot" style="background:#00E8FF"></span>
+                <span class="swatch-label">NEXUS</span>
               </button>
-              <button class="theme-swatch" data-theme="purple" title="Neon Purple">
-                <span class="swatch-dot" style="background:#B14EFF"></span>
-                <span class="swatch-dot" style="background:#00E5FF"></span>
-                <span class="swatch-label">PURPLE</span>
+              <button class="theme-swatch" data-theme="techno" title="Techno">
+                <span class="swatch-dot" style="background:#FF2E92"></span>
+                <span class="swatch-dot" style="background:#39FF14"></span>
+                <span class="swatch-label">TECHNO</span>
               </button>
             </div>
 

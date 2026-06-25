@@ -29,9 +29,10 @@ class SpeedometerModule {
         // behind real speed changes.
         this.kf = { Q: 0.0001, R: 0.01, P: 1.0, x: 0.0 };
 
-        // ── SVG arc geometry ──────────────────────────────
-        this.ARC_MAX_KMH  = 200;
-        this.ARC_CIRCUM   = 2 * Math.PI * 85;   // r = 85 → ≈ 534 px
+        // ── SVG arc/shape geometry per face ───────────────
+        this.ARC_MAX_KMH         = 200;
+        this.NEXUS_CIRCUM        = 2 * Math.PI * 68;  // Nexus ring r=68 → ≈427px
+        this.TECHNO_HEX_PERIMETER = 546;              // Techno hexagon perimeter (6 sides, computed)
 
         // ── GPS calibration ───────────────────────────────
         this.calibration  = Utils.Storage.get('gps_calibration', { lat: 0, lng: 0 });
@@ -47,7 +48,9 @@ class SpeedometerModule {
     // ─────────────────────────────────────────────────────
     _init() {
         this._setupUI();
-        this._generateDialTicks();
+        this._generateOriginBars();
+        this._generateNexusDots();
+        this._generateTechnoLEDs();
         this._startGPS();
         this._startAnimation();
         this._setupCompass();
@@ -56,28 +59,55 @@ class SpeedometerModule {
     }
 
     /**
-     * Generate tick marks for the Inferno-theme semi-circle needle dial.
-     * Built once via JS rather than hand-written in HTML — 11 ticks
-     * (every 20 km/h, 0–200) around a 180° arc centred at (100,105) r=85.
+     * ORIGIN face: vertical segmented speed bar (10 segments, 0-200 km/h).
+     * Purely GPS-speed-driven — NOT RPM/gear, since this app has no
+     * ECU/engine connection. Visual motif inspired by OEM TFT clusters.
      */
-    _generateDialTicks() {
-        const g = document.getElementById('dial-ticks');
+    _generateOriginBars() {
+        const track = document.getElementById('origin-bar-track');
+        if (!track) return;
+        this.ORIGIN_SEGMENTS = 10;
+        let html = '';
+        for (let i = 0; i < this.ORIGIN_SEGMENTS; i++) {
+            html += '<div class="origin-bar-segment"></div>';
+        }
+        track.innerHTML = html;
+        this._originSegmentEls = [...track.children];
+    }
+
+    /**
+     * NEXUS face: small decorative dots around the outer holographic ring.
+     * Purely atmospheric (not speed-reactive) — the inner progress ring
+     * already conveys speed; these add a "scanned particle ring" feel.
+     */
+    _generateNexusDots() {
+        const g = document.getElementById('nexus-dots');
         if (!g) return;
-        const cx = 100, cy = 105, rOuter = 85, rInnerMinor = 73, rInnerMajor = 68;
-        const steps = 10; // 11 ticks total (0..10)
+        const cx = 110, cy = 110, r = 102, count = 20;
         let svg = '';
-        for (let i = 0; i <= steps; i++) {
-            const angleDeg = 180 - (i / steps) * 180; // 180°→0°, left to right
-            const rad = (angleDeg * Math.PI) / 180;
-            const isMajor = i % 2 === 0; // every 40 km/h slightly longer
-            const rInner = isMajor ? rInnerMajor : rInnerMinor;
-            const x1 = cx + rOuter * Math.cos(rad);
-            const y1 = cy - rOuter * Math.sin(rad);
-            const x2 = cx + rInner * Math.cos(rad);
-            const y2 = cy - rInner * Math.sin(rad);
-            svg += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="${isMajor ? 'dial-tick-major' : 'dial-tick'}"/>`;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * 2 * Math.PI;
+            const x = cx + r * Math.cos(angle);
+            const y = cy + r * Math.sin(angle);
+            svg += `<circle class="nexus-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.6"/>`;
         }
         g.innerHTML = svg;
+    }
+
+    /**
+     * TECHNO face: horizontal LED bargraph (14 segments), classic
+     * equalizer/VU-meter look, lights up left→right with speed.
+     */
+    _generateTechnoLEDs() {
+        const bar = document.getElementById('techno-led-bar');
+        if (!bar) return;
+        this.TECHNO_SEGMENTS = 14;
+        let html = '';
+        for (let i = 0; i < this.TECHNO_SEGMENTS; i++) {
+            html += '<div class="techno-led-segment"></div>';
+        }
+        bar.innerHTML = html;
+        this._technoSegmentEls = [...bar.children];
     }
 
     // ─────────────────────────────────────────────────────
@@ -258,73 +288,88 @@ class SpeedometerModule {
         const spd = Math.round(this.displaySpeed);
         const zone = spd >= 140 ? 'danger' : (spd >= 100 ? 'warning' : 'normal');
 
-        this._renderFaceRing(spd, zone);
-        this._renderFaceDial(spd, zone);
-        this._renderFaceFlat(spd, zone);
+        this._renderFaceOrigin(spd, zone);
+        this._renderFaceNexus(spd, zone);
+        this._renderFaceTechno(spd, zone);
     }
 
-    /* ── FACE 1: Cyber ring ──────────────────────────────── */
-    _renderFaceRing(spd, zone) {
-        const valEl = document.getElementById('speed-value');
-        const arcEl = document.getElementById('speed-arc-fill');
-
+    /* ── FACE 1: Origin segmented bar ─────────────────────── */
+    _renderFaceOrigin(spd, zone) {
+        const valEl = document.getElementById('speed-value-origin');
         if (valEl) {
-            valEl.textContent = spd;
-            valEl.className   = 'speed-value';
+            valEl.className = 'origin-value';
             if (zone === 'danger')       valEl.classList.add('speed-danger');
             else if (zone === 'warning') valEl.classList.add('speed-warning');
+            valEl.textContent = spd;
+        }
+
+        if (this._originSegmentEls) {
+            const pct      = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+            const litCount = Math.round(pct * this.ORIGIN_SEGMENTS);
+            this._originSegmentEls.forEach((seg, i) => {
+                const isLit = i < litCount;
+                seg.classList.toggle('lit', isLit);
+                seg.classList.remove('seg-warning', 'seg-danger');
+                if (isLit && zone === 'danger')       seg.classList.add('seg-danger');
+                else if (isLit && zone === 'warning') seg.classList.add('seg-warning');
+            });
+        }
+    }
+
+    /* ── FACE 2: Nexus holographic ring ───────────────────── */
+    _renderFaceNexus(spd, zone) {
+        const valEl = document.getElementById('speed-value-nexus');
+        const arcEl = document.getElementById('nexus-arc-fill');
+
+        if (valEl) {
+            valEl.className = 'nexus-value';
+            if (zone === 'danger')       valEl.classList.add('speed-danger');
+            else if (zone === 'warning') valEl.classList.add('speed-warning');
+            valEl.textContent = spd;
         }
 
         if (arcEl) {
             const pct    = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
-            const offset = this.ARC_CIRCUM * (1 - pct);
+            const offset = this.NEXUS_CIRCUM * (1 - pct);
             arcEl.style.strokeDashoffset = offset.toFixed(1);
 
-            arcEl.classList.remove('speed-arc-normal', 'speed-arc-warning', 'speed-arc-danger');
-            arcEl.classList.add(`speed-arc-${zone}`);
+            arcEl.classList.remove('nexus-progress-normal', 'nexus-progress-warning', 'nexus-progress-danger');
+            arcEl.classList.add(`nexus-progress-${zone}`);
         }
     }
 
-    /* ── FACE 2: Inferno needle dial ─────────────────────── */
-    _renderFaceDial(spd, zone) {
-        const valEl    = document.getElementById('speed-value-dial');
-        const needleEl = document.getElementById('speed-needle');
+    /* ── FACE 3: Techno hexagon + LED bargraph ────────────── */
+    _renderFaceTechno(spd, zone) {
+        const valEl = document.getElementById('speed-value-techno');
+        const hexEl = document.getElementById('techno-hex-fill');
 
         if (valEl) {
-            valEl.textContent = spd;
-        }
-
-        if (needleEl) {
-            // 0 km/h → 180° (pointing left), 200 km/h → 0° (pointing right)
-            const pct   = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
-            const angle = 180 - pct * 180;
-            needleEl.setAttribute('transform', `rotate(${angle.toFixed(1)} 100 105)`);
-
-            needleEl.classList.remove('needle-warning', 'needle-danger');
-            if (zone === 'danger')       needleEl.classList.add('needle-danger');
-            else if (zone === 'warning') needleEl.classList.add('needle-warning');
-        }
-    }
-
-    /* ── FACE 3: Purple flat minimal ──────────────────────── */
-    _renderFaceFlat(spd, zone) {
-        const valEl = document.getElementById('speed-value-flat');
-        const barEl = document.getElementById('speed-bar-fill');
-
-        if (valEl) {
-            valEl.className = 'flat-value';
+            valEl.className = 'techno-value';
             if (zone === 'danger')       valEl.classList.add('speed-danger');
             else if (zone === 'warning') valEl.classList.add('speed-warning');
             valEl.textContent = spd;
         }
 
-        if (barEl) {
-            const pct = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1) * 100;
-            barEl.style.width = `${pct.toFixed(1)}%`;
+        const pct = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
 
-            barEl.classList.remove('bar-warning', 'bar-danger');
-            if (zone === 'danger')       barEl.classList.add('bar-danger');
-            else if (zone === 'warning') barEl.classList.add('bar-warning');
+        if (hexEl) {
+            const offset = this.TECHNO_HEX_PERIMETER * (1 - pct);
+            hexEl.style.strokeDashoffset = offset.toFixed(1);
+
+            hexEl.classList.remove('hex-warning', 'hex-danger');
+            if (zone === 'danger')       hexEl.classList.add('hex-danger');
+            else if (zone === 'warning') hexEl.classList.add('hex-warning');
+        }
+
+        if (this._technoSegmentEls) {
+            const litCount = Math.round(pct * this.TECHNO_SEGMENTS);
+            this._technoSegmentEls.forEach((seg, i) => {
+                const isLit = i < litCount;
+                seg.classList.toggle('lit', isLit);
+                seg.classList.remove('seg-warning', 'seg-danger');
+                if (isLit && zone === 'danger')       seg.classList.add('seg-danger');
+                else if (isLit && zone === 'warning') seg.classList.add('seg-warning');
+            });
         }
     }
 

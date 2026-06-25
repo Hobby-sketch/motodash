@@ -173,7 +173,7 @@ class MotoDash {
             brightness  : 100,
             autoTheme   : true,
             highAccuracy: true,
-            colorTheme  : 'cyber',
+            colorTheme  : 'origin',
             timeMode    : 'night'
         };
         // Merge with defaults so users upgrading from an older version

@@ -285,25 +285,32 @@ berpotensi menyesatkan pengguna.
 
 ---
 
-## 🎨 Color Theme &amp; Day/Night Mode
+## 🎨 Color Theme & Day/Night Mode
 
 MotoDash punya 3 tema yang masing-masing tampil dengan **susunan
-speedometer yang benar-benar berbeda** (bukan cuma ganti warna), plus
-mode tampilan siang/malam yang bisa dikombinasikan bebas dengan tema
-apa pun.
+speedometer yang benar-benar berbeda** (bukan cuma ganti warna),
+terinspirasi dari TFT cluster motor premium namun disesuaikan untuk
+motor matic — plus mode tampilan siang/malam yang bisa dikombinasikan
+bebas dengan tema apa pun.
+
+> ℹ️ **Catatan desain:** MotoDash 100% berbasis GPS tanpa koneksi ke
+> ECU/sensor motor. Karena itu, tidak ada indikator gigi (N/1/2/3),
+> RPM, tekanan ban, atau suhu mesin — semua data yang ditampilkan
+> murni berasal dari GPS &amp; sensor HP (lokasi, kecepatan, kompas).
 
 ### Color Theme — 3 susunan dashboard berbeda
 **Settings → DISPLAY → Color Theme** — pilih salah satu:
 
 | Tema | Gaya Speedometer | Lebar Panel Kiri | Karakter |
 |---|---|---|---|
-| **CYBER** (default) | Ring lingkar penuh, angka di tengah | 35% | Futuristik, klasik |
-| **INFERNO** | Dial jarum analog setengah lingkar + tick mark | 38% | Gaya tachometer mobil sport |
-| **PURPLE** | Angka flat raksasa + bar garis tipis, tanpa bentuk gauge | 30% (peta dapat ruang terbanyak) | Minimalis, ala dashboard EV modern |
+| **ORIGIN** (default) | Bar speed tersegmentasi + angka digital bersih | 35% | Gaya cluster TFT OEM motor premium |
+| **NEXUS** | Ring holografik berlapis berputar + angka tipis bercahaya | 36% | Futuristik, HUD sci-fi |
+| **TECHNO** | Bingkai heksagon neon + LED bargraph + pola grid | 34% | Cyberpunk, techno |
 
 Maps, Speedometer, dan Trip Meter tetap selalu tampil di ketiga tema —
-hanya bentuk/susunan speedometer dan proporsi lebar panel yang berubah.
-Pilihan tersimpan otomatis dan tetap aktif setiap kali aplikasi dibuka.
+hanya bentuk/susunan speedometer, bentuk sudut panel (rounded di Nexus,
+tajam di Techno), dan proporsi lebar panel yang berubah. Pilihan
+tersimpan otomatis dan tetap aktif setiap kali aplikasi dibuka.
 
 ### Day / Night Mode
 **Settings → DISPLAY → Auto Day/Night**:
