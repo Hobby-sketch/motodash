@@ -111,6 +111,7 @@ class MotoDash {
             const bat = await navigator.getBattery();
             const upd = () => {
                 const lvl  = Math.round(bat.level * 100);
+                this.batteryLevel = lvl; // expose for other modules (e.g. Origin cluster warning icon)
                 Utils.setEl('battery-percent', `${lvl}%`);
                 const fill = document.getElementById('battery-fill');
                 if (fill) {

@@ -760,13 +760,17 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
   </div>
   <div class="step-body">
     <p style="color:var(--dim);margin-bottom:12px">Langsung aktif saat aplikasi dibuka. Tidak perlu pengaturan apapun. Bentuk tampilannya berbeda tergantung Color Theme yang dipilih (lihat bagian "Ganti Tema" di bawah).</p>
-    <div class="tw"><table>
-      <tr><th>Yang Terlihat</th><th>Artinya</th></tr>
+    <div class="tw"><table style="margin-top:10px"><tr><th>Yang Terlihat</th><th>Artinya</th></tr>
       <tr><td>Angka besar (km/h)</td><td>Kecepatan kendaraan saat ini dari GPS</td></tr>
       <tr><td>● MOVING / STOPPED</td><td>Status bergerak atau berhenti</td></tr>
       <tr><td>GPS SEARCHING</td><td>Menunggu sinyal — perlu di luar ruangan</td></tr>
       <tr><td>GPS GOOD / EXCELLENT</td><td>Sinyal cukup, siap digunakan</td></tr>
     </table></div>
+
+    <div class="alert info" style="margin-top:10px">
+      <span class="ai">🛣️</span>
+      <p>Khusus tema <strong>ORIGIN</strong>, ada tambahan <strong>ODO</strong> di strip bawah ring — total jarak sejak pertama install (tidak pernah hilang meski Trip di-reset), plus 4 ikon status di kiri (GPS, Bluetooth, Voice, peringatan baterai HP lemah) yang menyala jika fitur terkait aktif.</p>
+    </div>
   </div>
 </div>
 
@@ -880,7 +884,7 @@ git push<button class="cbtn" onclick="cp('cretry')">Copy</button></div>
 
     <table style="margin-bottom:10px">
       <tr><th>Tema</th><th>Bentuk Speedometer</th></tr>
-      <tr><td><strong>ORIGIN</strong> (default)</td><td>Bar speed tersegmentasi + angka digital bersih — gaya OEM</td></tr>
+      <tr><td><strong>ORIGIN</strong> (default)</td><td>Ring speed bernomor + ikon status + ODO/AVG/TIME — cluster lengkap gaya OEM</td></tr>
       <tr><td><strong>NEXUS</strong></td><td>Ring holografik berlapis berputar — gaya HUD futuristik</td></tr>
       <tr><td><strong>TECHNO</strong></td><td>Bingkai heksagon neon + LED bargraph — gaya cyberpunk</td></tr>
     </table>

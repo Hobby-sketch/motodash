@@ -1,6 +1,11 @@
 /**
  * MotoDash — trip.js
  * Trip Computer: distance, avg/max speed, duration, GPX recording.
+ * Also tracks a Lifetime Odometer (total distance ever traveled with
+ * this app installed) — separate from the resettable Trip Meter,
+ * mirroring the "ODO" readout found on OEM motorcycle clusters, but
+ * honestly GPS-derived since this app has no connection to the
+ * vehicle's actual odometer/ECU.
  * Persists session state in LocalStorage.
  */
 
@@ -8,12 +13,15 @@
 
 class TripComputer {
     constructor() {
-        // ── Trip metrics ──────────────────────────────────
+        // ── Trip metrics (resettable) ─────────────────────
         this.totalDistance   = 0;    // meters
         this.maxSpeed        = 0;    // km/h
         this.speedReadings   = [];   // rolling buffer for avg
         this.elapsedSeconds  = 0;
         this.lastPosition    = null; // { lat, lng }
+
+        // ── Lifetime Odometer (NEVER reset by Trip Reset) ──
+        this.lifetimeDistance = 0;   // meters, persists forever
 
         // ── GPX track recording ───────────────────────────
         this.trackPoints     = [];   // { lat, lng, speed, time }
@@ -22,6 +30,7 @@ class TripComputer {
         this._timer          = null;
 
         this._loadState();
+        this._loadLifetimeOdo();
         this._startTimer();
         this._setupUI();
         console.log('[TripComputer] Initialized ✓');
@@ -61,6 +70,15 @@ class TripComputer {
         });
     }
 
+    /** Lifetime odometer uses its OWN storage key — reset() never touches it. */
+    _loadLifetimeOdo() {
+        this.lifetimeDistance = Utils.Storage.get('lifetime_odo_m', 0);
+    }
+
+    _saveLifetimeOdo() {
+        Utils.Storage.set('lifetime_odo_m', this.lifetimeDistance);
+    }
+
     // ─────────────────────────────────────────────────────
     //  TIMER
     // ─────────────────────────────────────────────────────
@@ -68,7 +86,10 @@ class TripComputer {
         this._timer = setInterval(() => {
             this.elapsedSeconds++;
             Utils.setEl('ride-duration', Utils.formatDuration(this.elapsedSeconds));
-            if (this.elapsedSeconds % 30 === 0) this._saveState();
+            if (this.elapsedSeconds % 30 === 0) {
+                this._saveState();
+                this._saveLifetimeOdo();
+            }
         }, 1000);
         // Render immediately
         Utils.setEl('ride-duration', Utils.formatDuration(this.elapsedSeconds));
@@ -86,14 +107,15 @@ class TripComputer {
             if (this.trackPoints.length > 2000) this.trackPoints.shift();
         }
 
-        // ── Distance accumulation ─────────────────────────
+        // ── Distance accumulation (trip + lifetime, same validated delta) ──
         if (this.lastPosition && lat && lng) {
             const d = Utils.haversineDistance(
                 this.lastPosition.lat, this.lastPosition.lng, lat, lng
             );
             // Accept movement only when >3 m and speed meaningful
             if (d > 3 && speedKmh > 2) {
-                this.totalDistance += d;
+                this.totalDistance    += d;
+                this.lifetimeDistance += d; // never reset by Trip Reset
             }
         }
 
@@ -121,6 +143,7 @@ class TripComputer {
     }
 
     get distanceKm() { return this.totalDistance / 1000; }
+    get lifetimeKm() { return this.lifetimeDistance / 1000; }
 
     // ─────────────────────────────────────────────────────
     //  RENDER
@@ -129,6 +152,10 @@ class TripComputer {
         Utils.setEl('trip-distance', `${this.distanceKm.toFixed(1)} km`);
         Utils.setEl('avg-speed',     `${Math.round(this.averageSpeed)} km/h`);
         Utils.setEl('max-speed',     `${Math.round(this.maxSpeed)} km/h`);
+
+        // Origin theme cluster readouts (no-op if elements don't exist)
+        Utils.setEl('origin-odo', `${this.lifetimeKm.toFixed(0)} km`);
+        Utils.setEl('origin-avg', `${Math.round(this.averageSpeed)} km/h`);
     }
 
     // ─────────────────────────────────────────────────────
@@ -161,6 +188,7 @@ class TripComputer {
     destroy() {
         clearInterval(this._timer);
         this._saveState();
+        this._saveLifetimeOdo();
     }
 }
 

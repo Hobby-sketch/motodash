@@ -303,7 +303,7 @@ bebas dengan tema apa pun.
 
 | Tema | Gaya Speedometer | Lebar Panel Kiri | Karakter |
 |---|---|---|---|
-| **ORIGIN** (default) | Bar speed tersegmentasi + angka digital bersih | 35% | Gaya cluster TFT OEM motor premium |
+| **ORIGIN** (default) | Ring speed bernomor + kolom status + info strip — cluster lengkap | 35% | Gaya cluster TFT OEM motor premium |
 | **NEXUS** | Ring holografik berlapis berputar + angka tipis bercahaya | 36% | Futuristik, HUD sci-fi |
 | **TECHNO** | Bingkai heksagon neon + LED bargraph + pola grid | 34% | Cyberpunk, techno |
 
@@ -361,6 +361,21 @@ COMPUTER** sebagai akses alternatif.
 1. **Settings → TRIP COMPUTER → Export GPX**
 2. File GPX didownload ke perangkat
 3. Dapat dibuka di Google Maps, Komoot, Garmin Connect, dll
+
+---
+
+## 🛣️ Lifetime Odometer (ODO)
+
+Berbeda dari **Trip Meter** yang bisa di-reset, **ODO** adalah total jarak
+kumulatif yang pernah ditempuh sejak aplikasi pertama dipasang —
+**tidak pernah ter-reset** oleh tombol Reset Trip manapun. Disimpan di
+LocalStorage dengan key terpisah (`lifetime_odo_m`), diakumulasi dari
+delta jarak GPS yang sama dengan Trip Meter.
+
+Tampil di **tema ORIGIN** pada strip info bawah ring speedometer
+(`ODO · AVG · TIME`). Ini murni angka jarak GPS — bukan odometer mesin
+asli motor, karena aplikasi ini tidak terhubung ke ECU/sensor motor
+sama sekali.
 
 ---
 

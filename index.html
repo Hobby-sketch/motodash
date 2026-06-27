@@ -145,11 +145,77 @@
 
       <!-- ═══ SPEED FACE 1 — ORIGIN: Segmented Bar + Clean Digital (OEM style) ═══ -->
       <div id="speed-face-origin" class="speed-face">
-        <div class="origin-gauge">
-          <div class="origin-bar-track" id="origin-bar-track"></div>
-          <div class="origin-readout">
-            <span id="speed-value-origin" class="origin-value">0</span>
-            <span class="origin-unit">km/h</span>
+        <div class="origin-cluster">
+
+          <!-- Status icon column — all HONEST, app/GPS-derived data.
+               No engine/ABS/stand/fuel warnings since there is no ECU
+               connection at all in this app. -->
+          <div class="origin-status-col">
+            <div class="origin-status-icon" id="origin-icon-gps" title="GPS Signal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+              </svg>
+            </div>
+            <div class="origin-status-icon" id="origin-icon-bt" title="Bluetooth">
+              <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 7 12 15 8 19 8 5 12 9 4 17"/>
+              </svg>
+            </div>
+            <div class="origin-status-icon" id="origin-icon-voice" title="Voice Assistant">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+              </svg>
+            </div>
+            <div class="origin-status-icon warn" id="origin-icon-battery" title="Low Phone Battery" style="display:none">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="7" width="18" height="10" rx="2"/>
+                <line x1="23" y1="11" x2="23" y2="13"/>
+                <rect x="3" y="9" width="4" height="6" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Numbered ring gauge — speed scale 0-200 km/h (NOT RPM,
+               this app has no tachometer/engine data) -->
+          <div class="origin-gauge">
+            <svg class="origin-gauge-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+              <circle class="origin-ring-track" cx="110" cy="110" r="95"
+                      fill="none" stroke-width="7"
+                      stroke-dasharray="448 149" stroke-linecap="round"
+                      transform="rotate(135 110 110)"/>
+              <circle id="origin-ring-fill" class="origin-ring-normal" cx="110" cy="110" r="95"
+                      fill="none" stroke-width="7"
+                      stroke-dasharray="0 597" stroke-linecap="round"
+                      transform="rotate(135 110 110)"
+                      style="transition:stroke-dasharray .12s linear, stroke .4s;"/>
+              <g id="origin-ticks"></g>
+            </svg>
+            <div class="origin-readout">
+              <span id="speed-value-origin" class="origin-value">0</span>
+              <span class="origin-unit">km/h</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom info strip — lifetime ODO (GPS-tracked, never reset),
+             average speed (from Trip Computer), current time -->
+        <div class="origin-info-strip">
+          <div class="origin-info-item">
+            <span class="origin-info-label">ODO</span>
+            <span class="origin-info-value" id="origin-odo">0 km</span>
+          </div>
+          <div class="origin-info-div"></div>
+          <div class="origin-info-item">
+            <span class="origin-info-label">AVG</span>
+            <span class="origin-info-value" id="origin-avg">0 km/h</span>
+          </div>
+          <div class="origin-info-div"></div>
+          <div class="origin-info-item">
+            <span class="origin-info-label">TIME</span>
+            <span class="origin-info-value" id="origin-time">--:--</span>
           </div>
         </div>
       </div>

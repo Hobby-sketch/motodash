@@ -59,20 +59,33 @@ class SpeedometerModule {
     }
 
     /**
-     * ORIGIN face: vertical segmented speed bar (10 segments, 0-200 km/h).
-     * Purely GPS-speed-driven — NOT RPM/gear, since this app has no
-     * ECU/engine connection. Visual motif inspired by OEM TFT clusters.
+     * ORIGIN face: numbered speed-scale ring (0,40,80,120,160,200 km/h)
+     * with a progress arc — purely GPS-speed-driven, NOT RPM/gear,
+     * since this app has no ECU/engine connection. Visual motif
+     * inspired by OEM TFT clusters, adapted to be 100% honest about
+     * what data is actually available.
+     *
+     * Geometry: 270° sweep, gap centred at the bottom. The ring track
+     * uses transform="rotate(135 110 110)" — native SVG angle 135°
+     * lands at lower-left (where "0" sits) and the dash extends
+     * clockwise 270° to native 45° at lower-right (where "200" sits),
+     * passing through native 270° (straight up) at the midpoint —
+     * exactly like a real speedometer face.
      */
     _generateOriginBars() {
-        const track = document.getElementById('origin-bar-track');
-        if (!track) return;
-        this.ORIGIN_SEGMENTS = 10;
-        let html = '';
-        for (let i = 0; i < this.ORIGIN_SEGMENTS; i++) {
-            html += '<div class="origin-bar-segment"></div>';
-        }
-        track.innerHTML = html;
-        this._originSegmentEls = [...track.children];
+        const g = document.getElementById('origin-ticks');
+        if (!g) return;
+        const cx = 110, cy = 110, rLabel = 78;
+        const labels = [0, 40, 80, 120, 160, 200];
+        let svg = '';
+        labels.forEach((val, i) => {
+            const angleDeg = 135 + (i / 5) * 270;
+            const rad = (angleDeg * Math.PI) / 180;
+            const x = cx + rLabel * Math.cos(rad);
+            const y = cy + rLabel * Math.sin(rad);
+            svg += `<text class="origin-tick-label" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${val}</text>`;
+        });
+        g.innerHTML = svg;
     }
 
     /**
@@ -293,7 +306,7 @@ class SpeedometerModule {
         this._renderFaceTechno(spd, zone);
     }
 
-    /* ── FACE 1: Origin segmented bar ─────────────────────── */
+    /* ── FACE 1: Origin numbered ring + status icons + info strip ── */
     _renderFaceOrigin(spd, zone) {
         const valEl = document.getElementById('speed-value-origin');
         if (valEl) {
@@ -303,17 +316,57 @@ class SpeedometerModule {
             valEl.textContent = spd;
         }
 
-        if (this._originSegmentEls) {
-            const pct      = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
-            const litCount = Math.round(pct * this.ORIGIN_SEGMENTS);
-            this._originSegmentEls.forEach((seg, i) => {
-                const isLit = i < litCount;
-                seg.classList.toggle('lit', isLit);
-                seg.classList.remove('seg-warning', 'seg-danger');
-                if (isLit && zone === 'danger')       seg.classList.add('seg-danger');
-                else if (isLit && zone === 'warning') seg.classList.add('seg-warning');
-            });
+        const ringEl = document.getElementById('origin-ring-fill');
+        if (ringEl) {
+            const pct = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+            const ORIGIN_VISIBLE = 448;   // arc-length of the 270° sweep (r=95)
+            const ORIGIN_TOTAL   = 597;   // full circumference (r=95)
+            const filled = ORIGIN_VISIBLE * pct;
+            ringEl.setAttribute('stroke-dasharray', `${filled.toFixed(1)} ${(ORIGIN_TOTAL - filled).toFixed(1)}`);
+
+            ringEl.classList.remove('origin-ring-normal', 'origin-ring-warning', 'origin-ring-danger');
+            ringEl.classList.add(`origin-ring-${zone}`);
         }
+
+        this._updateOriginStatusIcons();
+        this._updateOriginInfoStrip();
+    }
+
+    /**
+     * Status icon column — 100% honest, app-derived signals only.
+     * No engine/ABS/side-stand/fuel warnings (no ECU connection exists).
+     */
+    _updateOriginStatusIcons() {
+        const gpsIcon = document.getElementById('origin-icon-gps');
+        if (gpsIcon) {
+            const good = this.gpsSignal === 'EXCELLENT' || this.gpsSignal === 'GOOD';
+            gpsIcon.classList.toggle('active', good);
+        }
+
+        const btIcon = document.getElementById('origin-icon-bt');
+        if (btIcon) {
+            btIcon.classList.toggle('active', !!window.bluetoothModule?.hasConnectedDevice);
+        }
+
+        const voiceIcon = document.getElementById('origin-icon-voice');
+        if (voiceIcon) {
+            voiceIcon.classList.toggle('active', !!window.voiceModule?.isListening);
+        }
+
+        const battIcon = document.getElementById('origin-icon-battery');
+        if (battIcon) {
+            const lvl = window.app?.batteryLevel;
+            const low = typeof lvl === 'number' && lvl <= 15;
+            battIcon.style.display = low ? 'flex' : 'none';
+        }
+    }
+
+    /** Bottom info strip: lifetime ODO + average speed + current time. */
+    _updateOriginInfoStrip() {
+        Utils.setEl('origin-time', Utils.getCurrentTime());
+        // ODO and AVG are updated by TripComputer._render() directly
+        // (it already targets #origin-odo / #origin-avg) — nothing
+        // further needed here, kept for clarity of render flow.
     }
 
     /* ── FACE 2: Nexus holographic ring ───────────────────── */

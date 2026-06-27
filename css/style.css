@@ -254,31 +254,62 @@ html, body {
     display:flex;
 }
 
-/* ═══ FACE 1 — ORIGIN: Segmented Speed Bar + Clean Digital (OEM style) ═══
-   Inspired by premium motorcycle TFT clusters — a vertical segmented
-   bar (purely speed-driven, NOT RPM/gear since this app has no ECU
-   connection) beside a clean, legible digital readout. */
-.origin-gauge {
+/* ═══ FACE 1 — ORIGIN: OEM Instrument Cluster (adapted for matic, GPS-only) ═══
+   Inspired by premium motorcycle TFT clusters — numbered speed-scale
+   ring, status icon column, and info strip. Deliberately OMITS RPM,
+   gear position, engine/ABS warnings, fuel level, and battery voltage
+   since this app has zero connection to the vehicle's ECU/sensors —
+   every value shown here is honestly derived from GPS or the phone's
+   own sensors (location, Bluetooth, voice, phone battery). */
+.origin-cluster {
     display:flex; align-items:center; justify-content:center;
-    gap:20px; width:100%;
+    gap:14px; width:100%;
 }
-.origin-bar-track {
-    display:flex; flex-direction:column-reverse; gap:4px;
-    height:210px; width:14px; flex-shrink:0;
+
+/* Status icon column */
+.origin-status-col {
+    display:flex; flex-direction:column; gap:8px; flex-shrink:0;
 }
-.origin-bar-segment {
-    flex:1; border-radius:2px; background:var(--surf-5);
-    transition:background .15s, box-shadow .15s;
+.origin-status-icon {
+    width:24px; height:24px; border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--surf-2); color:var(--clr-muted);
+    transition:all .25s var(--ease);
 }
-.origin-bar-segment.lit {
-    background:var(--clr-primary);
-    box-shadow:0 0 8px color-mix(in srgb, var(--clr-primary) 70%, transparent);
+.origin-status-icon svg { width:14px; height:14px; }
+.origin-status-icon.active {
+    background:color-mix(in srgb, var(--clr-primary) 16%, transparent);
+    color:var(--clr-primary);
+    box-shadow:0 0 8px color-mix(in srgb, var(--clr-primary) 50%, transparent);
 }
-.origin-bar-segment.lit.seg-warning { background:var(--clr-warning); box-shadow:0 0 8px rgba(255,170,0,.6); }
-.origin-bar-segment.lit.seg-danger  { background:var(--clr-danger);  box-shadow:0 0 8px rgba(255,68,68,.7); }
-.origin-readout { display:flex; flex-direction:column; align-items:flex-start; }
+.origin-status-icon.warn {
+    background:rgba(255,68,68,.16); color:var(--clr-danger);
+    box-shadow:0 0 8px rgba(255,68,68,.5);
+    animation:origin-warn-pulse 1.2s ease-in-out infinite;
+}
+@keyframes origin-warn-pulse { 0%,100%{opacity:1;} 50%{opacity:.45;} }
+
+/* Numbered ring gauge */
+.origin-gauge {
+    position:relative; width:188px; height:188px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+}
+.origin-gauge-svg { position:absolute; inset:0; width:100%; height:100%; }
+.origin-ring-track { stroke:var(--surf-6); }
+.origin-ring-normal  { stroke:var(--clr-primary); filter:drop-shadow(0 0 8px color-mix(in srgb, var(--clr-primary) 60%, transparent)); }
+.origin-ring-warning { stroke:var(--clr-warning); }
+.origin-ring-danger  { stroke:var(--clr-danger);  }
+.origin-tick-label {
+    font-family:var(--f-mono); font-size:9px; fill:var(--clr-muted);
+    text-anchor:middle; dominant-baseline:middle;
+}
+.origin-readout {
+    position:relative; z-index:1;
+    display:flex; flex-direction:column; align-items:center;
+}
 .origin-value {
-    font-family:var(--f-display); font-size:88px; font-weight:600;
+    font-family:var(--f-display); font-size:58px; font-weight:700;
     line-height:1; letter-spacing:-1px; color:var(--clr-text);
     text-shadow:0 0 18px var(--text-glow);
     transition:color .4s, text-shadow .4s;
@@ -287,9 +318,25 @@ html, body {
 .origin-value.speed-danger  { color:var(--clr-danger); animation:spd-pulse .45s ease-in-out infinite alternate; }
 @keyframes spd-pulse { from{opacity:.8;} to{opacity:1;} }
 .origin-unit {
-    font-family:var(--f-ui); font-size:13px; font-weight:600;
+    font-family:var(--f-ui); font-size:11px; font-weight:600;
     letter-spacing:2px; color:var(--clr-dim); margin-top:-2px;
 }
+
+/* Bottom info strip — ODO (lifetime) / AVG speed / TIME */
+.origin-info-strip {
+    display:flex; align-items:center; justify-content:center;
+    gap:14px; width:100%; margin-top:2px;
+}
+.origin-info-item { display:flex; flex-direction:column; align-items:center; }
+.origin-info-label {
+    font-family:var(--f-mono); font-size:8px;
+    color:var(--clr-muted); letter-spacing:1.5px;
+}
+.origin-info-value {
+    font-family:var(--f-display); font-size:13px;
+    color:var(--clr-text); margin-top:1px; letter-spacing:.3px;
+}
+.origin-info-div { width:1px; height:18px; background:var(--border); }
 
 /* ═══ FACE 2 — NEXUS: Holographic Concentric Rings (futuristic HUD) ═══ */
 .nexus-gauge {
@@ -1064,8 +1111,8 @@ html, body {
    ═══════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
     :root { --left-w: 38%; }
-    .origin-bar-track { height:160px; width:11px; }
-    .origin-value { font-size:64px; }
+    .origin-gauge { width:150px; height:150px; }
+    .origin-value { font-size:46px; }
     .nexus-gauge  { width:170px; height:170px; }
     .nexus-value  { font-size:48px; }
     .techno-gauge { width:160px; }
@@ -1073,8 +1120,10 @@ html, body {
 }
 @media (max-width: 680px) {
     :root { --left-w: 44%; }
-    .origin-bar-track { height:130px; width:10px; }
-    .origin-value { font-size:52px; }
+    .origin-gauge { width:128px; height:128px; }
+    .origin-value { font-size:38px; }
+    .origin-status-col { display:none; }
+    .origin-info-strip { display:none; }
     .nexus-gauge  { width:140px; height:140px; }
     .nexus-value  { font-size:38px; }
     .techno-gauge { width:130px; }
@@ -1089,9 +1138,12 @@ html, body {
    ═══════════════════════════════════════════════════════════════════ */
 @media (max-height: 480px) {
     #left-panel { gap:4px; padding:4px 6px 3px; }
-    .origin-bar-track { height:140px; width:11px; }
-    .origin-value { font-size:60px; }
-    .origin-unit  { font-size:11px; }
+    .origin-gauge { width:140px; height:140px; }
+    .origin-value { font-size:42px; }
+    .origin-unit  { font-size:9px; }
+    .origin-status-icon { width:20px; height:20px; }
+    .origin-status-icon svg { width:12px; height:12px; }
+    .origin-info-value { font-size:11px; }
     .nexus-gauge  { width:160px; height:160px; }
     .nexus-value  { font-size:42px; }
     .techno-gauge { width:150px; }
@@ -1106,9 +1158,12 @@ html, body {
 
 @media (max-height: 400px) {
     #left-panel { gap:3px; padding:3px 5px 2px; }
-    .origin-bar-track { height:100px; width:9px; gap:3px; }
-    .origin-value { font-size:44px; }
-    .origin-unit  { font-size:9px; }
+    .origin-gauge { width:108px; height:108px; }
+    .origin-value { font-size:32px; }
+    .origin-unit  { font-size:8px; }
+    .origin-tick-label { font-size:7px; }
+    .origin-status-col { display:none; }
+    .origin-info-strip { display:none; }
     .nexus-gauge  { width:124px; height:124px; }
     .nexus-value  { font-size:32px; }
     .nexus-unit   { font-size:8px; }
@@ -1130,9 +1185,10 @@ html, body {
 
 @media (max-height: 340px) {
     #left-panel { gap:2px; }
-    .origin-bar-track { height:74px; }
-    .origin-value { font-size:32px; }
+    .origin-gauge { width:84px; height:84px; }
+    .origin-value { font-size:24px; }
     .origin-unit  { display:none; }
+    .origin-ticks, #origin-ticks { display:none; }
     .nexus-gauge  { width:98px; height:98px; }
     .nexus-value  { font-size:24px; }
     .nexus-unit   { display:none; }
