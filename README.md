@@ -304,8 +304,8 @@ bebas dengan tema apa pun.
 | Tema | Gaya Speedometer | Lebar Panel Kiri | Karakter |
 |---|---|---|---|
 | **ORIGIN** (default) | Ring speed bernomor + kolom status + info strip — cluster lengkap | 35% | Gaya cluster TFT OEM motor premium |
-| **NEXUS** | Ring holografik berlapis berputar + angka tipis bercahaya | 36% | Futuristik, HUD sci-fi |
-| **TECHNO** | Bingkai heksagon neon + LED bargraph + pola grid | 34% | Cyberpunk, techno |
+| **NEXUS** | Arc asimetris + badge status GPS/BT/Voice — gaya Honda X-ADV | 36% | Futuristik, HUD sci-fi |
+| **TECHNO** | Ring penuh bernomor + panel info samping — gaya Ducati Multistrada | 34% | Cyberpunk, presisi instrumen |
 
 Maps, Speedometer, dan Trip Meter tetap selalu tampil di ketiga tema —
 hanya bentuk/susunan speedometer, bentuk sudut panel (rounded di Nexus,
@@ -376,6 +376,20 @@ Tampil di **tema ORIGIN** pada strip info bawah ring speedometer
 (`ODO · AVG · TIME`). Ini murni angka jarak GPS — bukan odometer mesin
 asli motor, karena aplikasi ini tidak terhubung ke ECU/sensor motor
 sama sekali.
+
+---
+
+## 🌡️ Suhu Sekitar (Ambient Temperature)
+
+Tampil di tema **NEXUS** (`TEMP`) dan **TECHNO** (panel kanan), diambil
+dari **Open-Meteo** — API cuaca gratis tanpa API key, berbasis koordinat
+GPS HP, sama sekali tidak butuh sensor suhu di motor. Update otomatis
+setiap 15 menit (cukup untuk suhu udara yang berubah perlahan, dan
+menghemat kuota API gratis).
+
+> ℹ️ Ini suhu **udara sekitar** dari layanan cuaca — bukan suhu mesin
+> motor (yang butuh sensor fisik di blok mesin, tidak ada di aplikasi
+> berbasis GPS seperti ini).
 
 ---
 

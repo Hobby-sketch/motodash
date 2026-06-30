@@ -338,34 +338,38 @@ html, body {
 }
 .origin-info-div { width:1px; height:18px; background:var(--border); }
 
-/* ═══ FACE 2 — NEXUS: Holographic Concentric Rings (futuristic HUD) ═══ */
-.nexus-gauge {
-    position:relative; width:220px; height:220px;
+/* ═══ FACE 2 — NEXUS: Asymmetric Arc + Status Badges (Honda X-ADV
+   inspired, holographic styling kept for Nexus's futuristic identity) ═══ */
+.nexus-cluster {
     display:flex; align-items:center; justify-content:center;
+    gap:10px; width:100%;
+}
+.nexus-gauge {
+    position:relative; width:170px; height:153px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
 }
 .nexus-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .nexus-ring-outer {
     fill:none; stroke:var(--border); stroke-width:1;
-    stroke-dasharray:3 7; transform-origin:110px 110px;
+    stroke-dasharray:3 7; transform-origin:100px 90px;
     animation:nexus-spin 26s linear infinite;
 }
-.nexus-ring-mid {
-    fill:none; stroke:var(--border); stroke-width:1.5;
-    stroke-dasharray:1 11; transform-origin:110px 110px;
-    animation:nexus-spin-rev 19s linear infinite;
+@keyframes nexus-spin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+.nexus-arc-track { stroke:var(--surf-6); }
+.nexus-tick-label {
+    font-family:var(--f-mono); font-size:8px; fill:var(--clr-muted);
+    text-anchor:middle; dominant-baseline:middle;
 }
-@keyframes nexus-spin     { from{transform:rotate(0deg);}   to{transform:rotate(360deg);} }
-@keyframes nexus-spin-rev { from{transform:rotate(360deg);} to{transform:rotate(0deg);} }
-.nexus-dot { fill:var(--clr-secondary); opacity:.55; }
-#nexus-arc-fill.nexus-progress-normal  { stroke:var(--clr-primary); filter:drop-shadow(0 0 8px color-mix(in srgb, var(--clr-primary) 70%, transparent)); }
+#nexus-arc-fill.nexus-progress-normal  { stroke:var(--clr-primary); filter:drop-shadow(0 0 7px color-mix(in srgb, var(--clr-primary) 70%, transparent)); }
 #nexus-arc-fill.nexus-progress-warning { stroke:var(--clr-warning); }
 #nexus-arc-fill.nexus-progress-danger  { stroke:var(--clr-danger);  }
-.nexus-center {
-    position:relative; z-index:1;
+.nexus-readout {
+    position:relative; z-index:1; margin-top:18px;
     display:flex; flex-direction:column; align-items:center;
 }
 .nexus-value {
-    font-family:var(--f-display); font-size:62px; font-weight:300;
+    font-family:var(--f-display); font-size:50px; font-weight:300;
     line-height:1; letter-spacing:1px; color:var(--clr-text);
     text-shadow:0 0 22px var(--text-glow);
     transition:color .4s, text-shadow .4s;
@@ -373,30 +377,66 @@ html, body {
 .nexus-value.speed-warning { color:var(--clr-warning); }
 .nexus-value.speed-danger  { color:var(--clr-danger); animation:spd-pulse .45s ease-in-out infinite alternate; }
 .nexus-unit {
-    font-family:var(--f-mono); font-size:10px;
-    letter-spacing:4px; color:var(--clr-dim); margin-top:3px;
+    font-family:var(--f-mono); font-size:9px;
+    letter-spacing:3px; color:var(--clr-dim); margin-top:2px;
 }
 
-/* ═══ FACE 3 — TECHNO: Hexagon Frame + LED Bargraph (cyberpunk) ═══ */
+/* Status badge column — small holographic ring icons (mimics X-ADV's
+   P/EB/D/T/ABS badge style, but shows honest GPS/BT/Voice state) */
+.nexus-badge-col { display:flex; flex-direction:column; gap:9px; flex-shrink:0; }
+.nexus-badge {
+    width:30px; height:30px; border-radius:50%;
+    border:1.5px solid var(--surf-7); color:var(--clr-muted);
+    display:flex; align-items:center; justify-content:center;
+    transition:all .25s var(--ease);
+}
+.nexus-badge svg { width:15px; height:15px; }
+.nexus-badge.active {
+    border-color:var(--clr-primary); color:var(--clr-primary);
+    box-shadow:0 0 10px color-mix(in srgb, var(--clr-primary) 55%, transparent);
+}
+
+/* Bottom info row */
+.nexus-info-row {
+    display:flex; align-items:center; justify-content:center;
+    gap:16px; width:100%; margin-top:4px;
+}
+.nexus-info-item { display:flex; flex-direction:column; align-items:center; }
+.nexus-info-label {
+    font-family:var(--f-mono); font-size:8px;
+    color:var(--clr-muted); letter-spacing:1.5px;
+}
+.nexus-info-value {
+    font-family:var(--f-display); font-size:12px;
+    color:var(--clr-text); margin-top:1px; font-weight:300;
+}
+
+/* ═══ FACE 3 — TECHNO: Full Numbered Ring + Side Stack (Ducati
+   Multistrada inspired, magenta/green cyberpunk identity kept) ═══ */
+.techno-cluster {
+    display:flex; align-items:center; justify-content:center;
+    gap:12px; width:100%;
+}
 .techno-gauge {
-    position:relative; width:200px;
-    display:flex; flex-direction:column; align-items:center;
+    position:relative; width:172px; height:172px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
 }
-.techno-svg { width:100%; height:auto; overflow:visible; }
-.techno-hex-track { fill:rgba(0,0,0,.18); stroke:var(--border); stroke-width:2; }
-.techno-hex-fill {
-    stroke:var(--clr-primary);
-    filter:drop-shadow(0 0 8px color-mix(in srgb, var(--clr-primary) 70%, transparent));
-    transition:stroke-dashoffset .12s linear, stroke .3s;
+.techno-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.techno-ring-track { stroke:var(--surf-6); }
+.techno-tick-label {
+    font-family:var(--f-mono); font-size:8px; fill:var(--clr-muted);
+    text-anchor:middle; dominant-baseline:middle;
 }
-.techno-hex-fill.hex-warning { stroke:var(--clr-warning); }
-.techno-hex-fill.hex-danger  { stroke:var(--clr-danger);  }
-.techno-center {
-    position:absolute; top:48%; left:50%; transform:translate(-50%,-50%);
+.techno-ring-normal  { stroke:var(--clr-primary); filter:drop-shadow(0 0 8px color-mix(in srgb, var(--clr-primary) 70%, transparent)); }
+.techno-ring-warning { stroke:var(--clr-warning); }
+.techno-ring-danger  { stroke:var(--clr-danger);  }
+.techno-readout {
+    position:relative; z-index:1;
     display:flex; flex-direction:column; align-items:center;
 }
 .techno-value {
-    font-family:var(--f-display); font-size:54px; font-weight:900;
+    font-family:var(--f-display); font-size:46px; font-weight:900;
     line-height:1; letter-spacing:-1px; color:var(--clr-text);
     text-shadow:0 0 16px var(--text-glow);
     transition:color .4s, text-shadow .4s;
@@ -407,20 +447,60 @@ html, body {
     font-family:var(--f-mono); font-size:9px;
     letter-spacing:3px; color:var(--clr-dim);
 }
-.techno-led-bar {
-    display:flex; gap:3px; margin-top:12px; width:100%; justify-content:center;
+
+/* Right side info stack — honest GPS accuracy/heading + ambient temp
+   (mimics Ducati's EBC/DTC/ABS/DWC + oil-temp panel, but with data
+   this app can actually provide without any ECU connection) */
+.techno-side-stack {
+    display:flex; flex-direction:column; gap:7px; flex-shrink:0;
 }
-.techno-led-segment {
-    width:9px; height:20px; background:var(--surf-5);
-    clip-path:polygon(20% 0,100% 0,80% 100%,0 100%);
-    transition:background .12s, box-shadow .12s;
+.techno-side-item {
+    display:flex; flex-direction:column; align-items:center;
+    padding:4px 8px; border-radius:3px;
+    background:var(--surf-2); border:1px solid var(--surf-6);
+    min-width:48px;
 }
-.techno-led-segment.lit {
-    background:var(--clr-secondary);
-    box-shadow:0 0 8px color-mix(in srgb, var(--clr-secondary) 70%, transparent);
+.techno-side-label {
+    font-family:var(--f-mono); font-size:7px;
+    color:var(--clr-muted); letter-spacing:1px;
 }
-.techno-led-segment.lit.seg-warning { background:var(--clr-warning); box-shadow:0 0 8px rgba(255,170,0,.6); }
-.techno-led-segment.lit.seg-danger  { background:var(--clr-danger);  box-shadow:0 0 8px rgba(255,68,68,.7); }
+.techno-side-value {
+    font-family:var(--f-mono); font-size:10px;
+    color:var(--clr-secondary); margin-top:1px;
+}
+.techno-side-temp {
+    display:flex; align-items:center; justify-content:center;
+    padding:6px 8px; border-radius:3px; text-align:center;
+    background:var(--surf-2); border:1px solid var(--surf-6);
+    font-family:var(--f-display); font-size:13px; color:var(--clr-text);
+    min-width:48px;
+}
+
+/* Low battery warning box — mimics Ducati's red "Side Stand" flag,
+   repurposed for the only honest warning this app can detect */
+.techno-warn-box {
+    width:100%; text-align:center; margin-top:4px;
+    padding:5px; border-radius:3px;
+    background:rgba(255,68,68,.14); border:1px solid var(--clr-danger);
+    color:var(--clr-danger);
+    font-family:var(--f-mono); font-size:10px; font-weight:700; letter-spacing:1px;
+    animation:origin-warn-pulse 1.2s ease-in-out infinite;
+}
+
+/* Bottom info row */
+.techno-info-row {
+    display:flex; align-items:center; justify-content:center;
+    gap:14px; width:100%; margin-top:4px;
+}
+.techno-info-item { display:flex; flex-direction:column; align-items:center; }
+.techno-info-label {
+    font-family:var(--f-mono); font-size:8px;
+    color:var(--clr-muted); letter-spacing:1.5px;
+}
+.techno-info-value {
+    font-family:var(--f-display); font-size:12px;
+    color:var(--clr-text); margin-top:1px;
+}
 
 /* ── Vehicle Status ── */
 #vehicle-status-container { width:100%; display:flex; justify-content:center; }
@@ -1113,10 +1193,10 @@ html, body {
     :root { --left-w: 38%; }
     .origin-gauge { width:150px; height:150px; }
     .origin-value { font-size:46px; }
-    .nexus-gauge  { width:170px; height:170px; }
-    .nexus-value  { font-size:48px; }
-    .techno-gauge { width:160px; }
-    .techno-value { font-size:42px; }
+    .nexus-gauge  { width:140px; height:126px; }
+    .nexus-value  { font-size:38px; }
+    .techno-gauge { width:150px; height:150px; }
+    .techno-value { font-size:36px; }
 }
 @media (max-width: 680px) {
     :root { --left-w: 44%; }
@@ -1124,10 +1204,14 @@ html, body {
     .origin-value { font-size:38px; }
     .origin-status-col { display:none; }
     .origin-info-strip { display:none; }
-    .nexus-gauge  { width:140px; height:140px; }
-    .nexus-value  { font-size:38px; }
-    .techno-gauge { width:130px; }
-    .techno-value { font-size:34px; }
+    .nexus-gauge      { width:118px; height:106px; }
+    .nexus-value      { font-size:32px; }
+    .nexus-badge-col  { display:none; }
+    .nexus-info-row   { display:none; }
+    .techno-gauge      { width:128px; height:128px; }
+    .techno-value      { font-size:30px; }
+    .techno-side-stack { display:none; }
+    .techno-info-row   { display:none; }
     #compass-widget { display:none; }
 }
 
@@ -1144,11 +1228,14 @@ html, body {
     .origin-status-icon { width:20px; height:20px; }
     .origin-status-icon svg { width:12px; height:12px; }
     .origin-info-value { font-size:11px; }
-    .nexus-gauge  { width:160px; height:160px; }
-    .nexus-value  { font-size:42px; }
-    .techno-gauge { width:150px; }
-    .techno-value { font-size:38px; }
-    .techno-led-segment { height:14px; }
+    .nexus-gauge      { width:135px; height:121px; }
+    .nexus-value      { font-size:34px; }
+    .nexus-badge      { width:24px; height:24px; }
+    .nexus-info-value { font-size:11px; }
+    .techno-gauge      { width:140px; height:140px; }
+    .techno-value      { font-size:32px; }
+    .techno-side-item, .techno-side-temp { padding:3px 6px; font-size:9px; }
+    .techno-info-value { font-size:11px; }
     .vehicle-status { padding:2px 10px; font-size:8px; }
     .compass-rose { width:34px; height:34px; }
     .info-panel { padding:4px 7px; }
@@ -1164,13 +1251,16 @@ html, body {
     .origin-tick-label { font-size:7px; }
     .origin-status-col { display:none; }
     .origin-info-strip { display:none; }
-    .nexus-gauge  { width:124px; height:124px; }
-    .nexus-value  { font-size:32px; }
-    .nexus-unit   { font-size:8px; }
-    .techno-gauge { width:114px; }
-    .techno-value { font-size:28px; }
-    .techno-led-bar { margin-top:6px; }
-    .techno-led-segment { height:11px; width:7px; }
+    .nexus-gauge     { width:100px; height:90px; }
+    .nexus-value     { font-size:26px; }
+    .nexus-unit      { font-size:8px; }
+    .nexus-badge-col { display:none; }
+    .nexus-info-row  { display:none; }
+    .techno-gauge      { width:104px; height:104px; }
+    .techno-value      { font-size:24px; }
+    .techno-side-stack { display:none; }
+    .techno-info-row   { display:none; }
+    .techno-warn-box   { font-size:8px; padding:3px; }
     .vehicle-status { padding:1px 8px; font-size:7px; letter-spacing:1px; }
     #compass-widget { display:none; }
     .info-panel { padding:3px 6px; }
@@ -1188,12 +1278,14 @@ html, body {
     .origin-gauge { width:84px; height:84px; }
     .origin-value { font-size:24px; }
     .origin-unit  { display:none; }
-    .origin-ticks, #origin-ticks { display:none; }
-    .nexus-gauge  { width:98px; height:98px; }
-    .nexus-value  { font-size:24px; }
+    #origin-ticks { display:none; }
+    .nexus-gauge  { width:78px; height:70px; }
+    .nexus-value  { font-size:20px; }
     .nexus-unit   { display:none; }
-    .techno-gauge { width:90px; }
-    .techno-value { font-size:22px; }
-    .techno-unit  { display:none; }
-    .techno-led-bar { display:none; }
+    #nexus-ticks  { display:none; }
+    .techno-gauge    { width:80px; height:80px; }
+    .techno-value    { font-size:18px; }
+    .techno-unit     { display:none; }
+    .techno-warn-box { display:none; }
+    #techno-ticks    { display:none; }
 }

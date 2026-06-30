@@ -6,19 +6,22 @@
  * As of this version, ALL static libraries (Leaflet, Leaflet Routing
  * Machine, jsmediatags, fonts) are SELF-HOSTED under vendor/ and css/ —
  * there is no third-party CDN dependency for any static file. The only
- * external network calls this app makes are to 3 live data APIs that
+ * external network calls this app makes are to 4 live data APIs that
  * cannot be self-hosted (they are dynamic services, not static files):
  *
  *   1. nominatim.openstreetmap.org — address/place search results
  *   2. router.project-osrm.org     — turn-by-turn route calculation
  *   3. *.basemaps.cartocdn.com     — map tile images
+ *   4. api.open-meteo.com          — ambient temperature (free, no API
+ *                                    key, GPS-based — no vehicle
+ *                                    connection needed)
  *
  * CACHE RULES (explicit TTL per cache type — no indefinite caching):
  * ────────────────────────────────────────────────────────────────
- *   SHELL  → Stale-While-Revalidate, no TTL (versioned by CACHE_VERSION)
- *   TILES  → Cache-First, TTL 7 days  (map imagery changes rarely)
- *   API    → Network-First, TTL 1 hour (search results go stale fast)
- *   ROUTE  → Network-Only, never cached (routes must always be fresh)
+ *   SHELL   → Stale-While-Revalidate, no TTL (versioned by CACHE_VERSION)
+ *   TILES   → Cache-First, TTL 7 days  (map imagery changes rarely)
+ *   API     → Network-First, TTL 1 hour (search/weather go stale fast)
+ *   ROUTE   → Network-Only, never cached (routes must always be fresh)
  *
  * COOKIE POLICY:
  * This Service Worker and the app it serves NEVER set cookies. All
@@ -31,7 +34,7 @@
 
 /* Bump this version string on every deploy that changes cached files.
  * Old caches are purged automatically in the 'activate' event below. */
-const CACHE_VERSION = 'v2-selfhosted';
+const CACHE_VERSION = 'v3-clusters';
 
 const CACHE_SHELL = `motodash-shell-${CACHE_VERSION}`;
 const CACHE_TILES = `motodash-tiles-${CACHE_VERSION}`;
@@ -39,7 +42,7 @@ const CACHE_API   = `motodash-api-${CACHE_VERSION}`;
 
 /* TTL in milliseconds — explicit expiry per cache type */
 const TTL_TILES = 7  * 24 * 60 * 60 * 1000;  // 7 days
-const TTL_API   = 1  * 60 * 60 * 1000;       // 1 hour
+const TTL_API   = 1  * 60 * 60 * 1000;       // 1 hour (search + weather)
 
 /* App shell — every file is now same-origin (self-hosted) */
 const SHELL_URLS = [
@@ -136,6 +139,13 @@ self.addEventListener('fetch', (event) => {
 
     /* ── Nominatim search → Network-First, 1-hour TTL ──────────── */
     if (url.hostname === 'nominatim.openstreetmap.org') {
+        event.respondWith(networkFirstWithTTL(req, CACHE_API, TTL_API));
+        return;
+    }
+
+    /* ── Open-Meteo weather → Network-First, 1-hour TTL ──────────
+       (ambient temperature is GPS-based, no vehicle connection) */
+    if (url.hostname === 'api.open-meteo.com') {
         event.respondWith(networkFirstWithTTL(req, CACHE_API, TTL_API));
         return;
     }

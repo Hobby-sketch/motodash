@@ -7,12 +7,15 @@
     ════════════════════════════════════════════════════════════════
     CONTENT-SECURITY-POLICY — explicit allow-list for source & destination
     ════════════════════════════════════════════════════════════════
-    Everything is 'self' (this domain only) EXCEPT 3 live data APIs that
+    Everything is 'self' (this domain only) EXCEPT 4 live data APIs that
     cannot be self-hosted because they are dynamic services, not static
     files:
       - nominatim.openstreetmap.org  → address/place search (geocoding)
       - router.project-osrm.org      → turn-by-turn route calculation
       - *.basemaps.cartocdn.com      → map tile images (a/b/c/d subdomains)
+      - api.open-meteo.com           → ambient temperature (free, no API
+                                        key — GPS-based, zero vehicle
+                                        connection needed)
     No other domain — third-party or otherwise — is permitted to load
     scripts, styles, fonts, or receive connections from this page.
   -->
@@ -22,7 +25,7 @@
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: https://*.basemaps.cartocdn.com;
     font-src 'self';
-    connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.basemaps.cartocdn.com;
+    connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.basemaps.cartocdn.com https://api.open-meteo.com;
     worker-src 'self';
     manifest-src 'self';
     base-uri 'self';
@@ -221,43 +224,119 @@
       </div>
 
       <!-- ═══ SPEED FACE 2 — NEXUS: Holographic Concentric Rings ═══ -->
+      <!-- ═══ SPEED FACE 2 — NEXUS: Asymmetric Arc + Status Badges
+           (Honda X-ADV inspired, adapted — no RPM/gear/ride-mode since
+           there's no ECU connection; badges show GPS/BT/Voice instead) ═══ -->
       <div id="speed-face-nexus" class="speed-face">
-        <div class="nexus-gauge">
-          <svg class="nexus-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-            <circle class="nexus-ring-outer" cx="110" cy="110" r="102"/>
-            <circle class="nexus-ring-mid"   cx="110" cy="110" r="86"/>
-            <g class="nexus-dots" id="nexus-dots"></g>
-            <circle cx="110" cy="110" r="68"
-                    fill="none" stroke="var(--border)" stroke-width="6"/>
-            <circle id="nexus-arc-fill" cx="110" cy="110" r="68"
-                    class="nexus-progress-normal"
-                    fill="none" stroke-width="6" stroke-linecap="round"
-                    stroke-dasharray="427" stroke-dashoffset="427"
-                    transform="rotate(-90 110 110)"/>
-          </svg>
-          <div class="nexus-center">
-            <span id="speed-value-nexus" class="nexus-value">0</span>
-            <span class="nexus-unit">km/h</span>
+        <div class="nexus-cluster">
+          <div class="nexus-gauge">
+            <svg class="nexus-svg" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+              <circle class="nexus-ring-outer" cx="100" cy="90" r="92"/>
+              <circle class="nexus-arc-track" cx="100" cy="90" r="80"
+                      fill="none" stroke-width="3"
+                      stroke-dasharray="196 307" stroke-linecap="round"
+                      transform="rotate(140 100 90)"/>
+              <circle id="nexus-arc-fill" cx="100" cy="90" r="80"
+                      class="nexus-progress-normal"
+                      fill="none" stroke-width="3" stroke-linecap="round"
+                      stroke-dasharray="0 503"
+                      transform="rotate(140 100 90)"
+                      style="transition:stroke-dasharray .12s linear, stroke .4s;"/>
+              <g id="nexus-ticks"></g>
+            </svg>
+            <div class="nexus-readout">
+              <span id="speed-value-nexus" class="nexus-value">0</span>
+              <span class="nexus-unit">km/h</span>
+            </div>
+          </div>
+          <div class="nexus-badge-col">
+            <div class="nexus-badge" id="nexus-badge-gps" title="GPS Signal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+              </svg>
+            </div>
+            <div class="nexus-badge" id="nexus-badge-bt" title="Bluetooth">
+              <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 7 12 15 8 19 8 5 12 9 4 17"/>
+              </svg>
+            </div>
+            <div class="nexus-badge" id="nexus-badge-voice" title="Voice Assistant">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="nexus-info-row">
+          <div class="nexus-info-item">
+            <span class="nexus-info-label">TRIP</span>
+            <span class="nexus-info-value" id="nexus-trip">0.0 km</span>
+          </div>
+          <div class="nexus-info-item">
+            <span class="nexus-info-label">AVG</span>
+            <span class="nexus-info-value" id="nexus-avg">0 km/h</span>
+          </div>
+          <div class="nexus-info-item">
+            <span class="nexus-info-label">TEMP</span>
+            <span class="nexus-info-value" id="nexus-temp">--°C</span>
           </div>
         </div>
       </div>
 
-      <!-- ═══ SPEED FACE 3 — TECHNO: Hexagon Frame + LED Bargraph ═══ -->
+      <!-- ═══ SPEED FACE 3 — TECHNO: Full Numbered Ring + Side Stack
+           (Ducati Multistrada inspired, adapted — no RPM/gear/EBC-DTC-
+           ABS-DWC rider aids/side-stand/oil-temp since there's no ECU;
+           side stack shows GPS accuracy/heading + ambient temp instead) ═══ -->
       <div id="speed-face-techno" class="speed-face">
-        <div class="techno-gauge">
-          <svg class="techno-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <polygon class="techno-hex-track"
-                     points="100,8 178,54 178,146 100,192 22,146 22,54"/>
-            <polygon id="techno-hex-fill" class="techno-hex-fill"
-                     points="100,8 178,54 178,146 100,192 22,146 22,54"
-                     fill="none" stroke-width="4"
-                     stroke-dasharray="546" stroke-dashoffset="546"/>
-          </svg>
-          <div class="techno-center">
-            <span id="speed-value-techno" class="techno-value">0</span>
-            <span class="techno-unit">KM/H</span>
+        <div class="techno-cluster">
+          <div class="techno-gauge">
+            <svg class="techno-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+              <circle class="techno-ring-track" cx="110" cy="110" r="98"
+                      fill="none" stroke-width="5"
+                      stroke-dasharray="548 68" stroke-linecap="round"
+                      transform="rotate(110 110 110)"/>
+              <circle id="techno-ring-fill" cx="110" cy="110" r="98"
+                      class="techno-ring-normal"
+                      fill="none" stroke-width="5" stroke-linecap="round"
+                      stroke-dasharray="0 616"
+                      transform="rotate(110 110 110)"
+                      style="transition:stroke-dasharray .12s linear, stroke .4s;"/>
+              <g id="techno-ticks"></g>
+            </svg>
+            <div class="techno-readout">
+              <span id="speed-value-techno" class="techno-value">0</span>
+              <span class="techno-unit">KM/H</span>
+            </div>
           </div>
-          <div class="techno-led-bar" id="techno-led-bar"></div>
+          <div class="techno-side-stack">
+            <div class="techno-side-item">
+              <span class="techno-side-label">ACC</span>
+              <span class="techno-side-value" id="techno-gps-acc">-- m</span>
+            </div>
+            <div class="techno-side-item">
+              <span class="techno-side-label">HDG</span>
+              <span class="techno-side-value" id="techno-heading">--°</span>
+            </div>
+            <div class="techno-side-temp" id="techno-temp">--°C</div>
+          </div>
+        </div>
+        <div class="techno-warn-box" id="techno-battery-warn" style="display:none">
+          ⚠ LOW BATTERY
+        </div>
+        <div class="techno-info-row">
+          <div class="techno-info-item">
+            <span class="techno-info-label">TRIP</span>
+            <span class="techno-info-value" id="techno-trip">0.0 km</span>
+          </div>
+          <div class="techno-info-item">
+            <span class="techno-info-label">TIME</span>
+            <span class="techno-info-value" id="techno-time">--:--</span>
+          </div>
+          <div class="techno-info-item">
+            <span class="techno-info-label">AVG</span>
+            <span class="techno-info-value" id="techno-avg">0 km/h</span>
+          </div>
         </div>
       </div>
 

@@ -30,9 +30,17 @@ class SpeedometerModule {
         this.kf = { Q: 0.0001, R: 0.01, P: 1.0, x: 0.0 };
 
         // ── SVG arc/shape geometry per face ───────────────
-        this.ARC_MAX_KMH         = 200;
-        this.NEXUS_CIRCUM        = 2 * Math.PI * 68;  // Nexus ring r=68 → ≈427px
-        this.TECHNO_HEX_PERIMETER = 546;              // Techno hexagon perimeter (6 sides, computed)
+        this.ARC_MAX_KMH    = 200;
+        this.NEXUS_VISIBLE  = 196;  // Nexus arc: 140° sweep, r=80 (≈503 circumference)
+        this.NEXUS_TOTAL    = 503;
+        this.TECHNO_VISIBLE = 548;  // Techno ring: 320° sweep, r=98 (≈616 circumference)
+        this.TECHNO_TOTAL   = 616;
+
+        // ── Ambient temperature (via free weather API, GPS-based —
+        //    no vehicle connection needed, exactly like the other GPS
+        //    features in this app) ──────────────────────────────
+        this.ambientTemp      = null;
+        this._lastWeatherFetch = 0;
 
         // ── GPS calibration ───────────────────────────────
         this.calibration  = Utils.Storage.get('gps_calibration', { lat: 0, lng: 0 });
@@ -89,38 +97,51 @@ class SpeedometerModule {
     }
 
     /**
-     * NEXUS face: small decorative dots around the outer holographic ring.
-     * Purely atmospheric (not speed-reactive) — the inner progress ring
-     * already conveys speed; these add a "scanned particle ring" feel.
+     * NEXUS face: tick labels along the asymmetric 140° arc
+     * (0,50,100,150,200 km/h). Geometry: sweep starts at native SVG
+     * angle 140° (lower-left) and runs clockwise 140° to native 280°
+     * (upper area) — matching transform="rotate(140 100 90)" on the
+     * arc elements, verified against the same technique used for
+     * Origin's ring.
      */
     _generateNexusDots() {
-        const g = document.getElementById('nexus-dots');
+        const g = document.getElementById('nexus-ticks');
         if (!g) return;
-        const cx = 110, cy = 110, r = 102, count = 20;
+        const cx = 100, cy = 90, rLabel = 68;
+        const labels = [0, 50, 100, 150, 200];
         let svg = '';
-        for (let i = 0; i < count; i++) {
-            const angle = (i / count) * 2 * Math.PI;
-            const x = cx + r * Math.cos(angle);
-            const y = cy + r * Math.sin(angle);
-            svg += `<circle class="nexus-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.6"/>`;
-        }
+        labels.forEach((val, i) => {
+            const angleDeg = 140 + (i / 4) * 140;
+            const rad = (angleDeg * Math.PI) / 180;
+            const x = cx + rLabel * Math.cos(rad);
+            const y = cy + rLabel * Math.sin(rad);
+            svg += `<text class="nexus-tick-label" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${val}</text>`;
+        });
         g.innerHTML = svg;
     }
 
     /**
-     * TECHNO face: horizontal LED bargraph (14 segments), classic
-     * equalizer/VU-meter look, lights up left→right with speed.
+     * TECHNO face: tick labels around the near-full 320° ring
+     * (0,25,50,...,200 km/h — 9 labels, denser scale matching the
+     * Ducati-inspired precision-instrument look). Sweep starts at
+     * native angle 110° and runs clockwise 320° to native 430°≡70°,
+     * leaving a 40° gap centred at the bottom — matches
+     * transform="rotate(110 110 110)" on the ring elements.
      */
     _generateTechnoLEDs() {
-        const bar = document.getElementById('techno-led-bar');
-        if (!bar) return;
-        this.TECHNO_SEGMENTS = 14;
-        let html = '';
-        for (let i = 0; i < this.TECHNO_SEGMENTS; i++) {
-            html += '<div class="techno-led-segment"></div>';
-        }
-        bar.innerHTML = html;
-        this._technoSegmentEls = [...bar.children];
+        const g = document.getElementById('techno-ticks');
+        if (!g) return;
+        const cx = 110, cy = 110, rLabel = 80;
+        const labels = [0, 25, 50, 75, 100, 125, 150, 175, 200];
+        let svg = '';
+        labels.forEach((val, i) => {
+            const angleDeg = 110 + (i / 8) * 320;
+            const rad = (angleDeg * Math.PI) / 180;
+            const x = cx + rLabel * Math.cos(rad);
+            const y = cy + rLabel * Math.sin(rad);
+            svg += `<text class="techno-tick-label" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${val}</text>`;
+        });
+        g.innerHTML = svg;
     }
 
     // ─────────────────────────────────────────────────────
@@ -235,6 +256,39 @@ class SpeedometerModule {
 
         // Update trip computer
         window.tripComputer?.update(lat, lng, this.targetSpeed);
+
+        // Update ambient temperature (throttled internally — GPS-based,
+        // no vehicle connection needed)
+        this._fetchAmbientTemp(lat, lng);
+    }
+
+    /**
+     * Ambient temperature via Open-Meteo (free, no API key — same
+     * no-cost philosophy as Nominatim/OSRM/CartoDB already used in
+     * this app). Fully GPS-based; needs zero connection to the
+     * vehicle. Throttled to once every 15 minutes since weather
+     * doesn't change second-to-second and we want to be a good
+     * citizen of a free public API.
+     */
+    async _fetchAmbientTemp(lat, lng) {
+        const now = Date.now();
+        const FIFTEEN_MIN = 15 * 60 * 1000;
+        if (now - this._lastWeatherFetch < FIFTEEN_MIN) return;
+        this._lastWeatherFetch = now;
+
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lng.toFixed(3)}&current=temperature_2m`;
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            const temp = data?.current?.temperature_2m;
+            if (typeof temp === 'number') {
+                this.ambientTemp = Math.round(temp);
+            }
+        } catch (err) {
+            console.warn('[Speedometer] Ambient temp fetch failed:', err.message);
+            // Non-fatal — UI simply keeps showing "--°C" until next attempt
+        }
     }
 
     _onError(error) {
@@ -369,7 +423,7 @@ class SpeedometerModule {
         // further needed here, kept for clarity of render flow.
     }
 
-    /* ── FACE 2: Nexus holographic ring ───────────────────── */
+    /* ── FACE 2: Nexus asymmetric arc + status badges ─────── */
     _renderFaceNexus(spd, zone) {
         const valEl = document.getElementById('speed-value-nexus');
         const arcEl = document.getElementById('nexus-arc-fill');
@@ -382,19 +436,37 @@ class SpeedometerModule {
         }
 
         if (arcEl) {
-            const pct    = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
-            const offset = this.NEXUS_CIRCUM * (1 - pct);
-            arcEl.style.strokeDashoffset = offset.toFixed(1);
+            const pct     = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+            const filled  = this.NEXUS_VISIBLE * pct;
+            arcEl.setAttribute('stroke-dasharray', `${filled.toFixed(1)} ${(this.NEXUS_TOTAL - filled).toFixed(1)}`);
 
             arcEl.classList.remove('nexus-progress-normal', 'nexus-progress-warning', 'nexus-progress-danger');
             arcEl.classList.add(`nexus-progress-${zone}`);
         }
+
+        this._updateNexusBadges();
+        Utils.setEl('nexus-trip', `${(window.tripComputer?.distanceKm ?? 0).toFixed(1)} km`);
+        Utils.setEl('nexus-avg',  `${Math.round(window.tripComputer?.averageSpeed ?? 0)} km/h`);
+        Utils.setEl('nexus-temp', this.ambientTemp != null ? `${this.ambientTemp}°C` : '--°C');
     }
 
-    /* ── FACE 3: Techno hexagon + LED bargraph ────────────── */
+    /** Status badges — honest GPS/Bluetooth/Voice state (mimics
+     *  X-ADV's P/EB/D/T/ABS badge ring style, no ride-mode data). */
+    _updateNexusBadges() {
+        const gps = document.getElementById('nexus-badge-gps');
+        if (gps) gps.classList.toggle('active', this.gpsSignal === 'EXCELLENT' || this.gpsSignal === 'GOOD');
+
+        const bt = document.getElementById('nexus-badge-bt');
+        if (bt) bt.classList.toggle('active', !!window.bluetoothModule?.hasConnectedDevice);
+
+        const voice = document.getElementById('nexus-badge-voice');
+        if (voice) voice.classList.toggle('active', !!window.voiceModule?.isListening);
+    }
+
+    /* ── FACE 3: Techno full numbered ring + side stack ───── */
     _renderFaceTechno(spd, zone) {
         const valEl = document.getElementById('speed-value-techno');
-        const hexEl = document.getElementById('techno-hex-fill');
+        const ringEl = document.getElementById('techno-ring-fill');
 
         if (valEl) {
             valEl.className = 'techno-value';
@@ -403,27 +475,32 @@ class SpeedometerModule {
             valEl.textContent = spd;
         }
 
-        const pct = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+        if (ringEl) {
+            const pct    = Math.min(this.displaySpeed / this.ARC_MAX_KMH, 1);
+            const filled = this.TECHNO_VISIBLE * pct;
+            ringEl.setAttribute('stroke-dasharray', `${filled.toFixed(1)} ${(this.TECHNO_TOTAL - filled).toFixed(1)}`);
 
-        if (hexEl) {
-            const offset = this.TECHNO_HEX_PERIMETER * (1 - pct);
-            hexEl.style.strokeDashoffset = offset.toFixed(1);
-
-            hexEl.classList.remove('hex-warning', 'hex-danger');
-            if (zone === 'danger')       hexEl.classList.add('hex-danger');
-            else if (zone === 'warning') hexEl.classList.add('hex-warning');
+            ringEl.classList.remove('techno-ring-normal', 'techno-ring-warning', 'techno-ring-danger');
+            ringEl.classList.add(`techno-ring-${zone}`);
         }
 
-        if (this._technoSegmentEls) {
-            const litCount = Math.round(pct * this.TECHNO_SEGMENTS);
-            this._technoSegmentEls.forEach((seg, i) => {
-                const isLit = i < litCount;
-                seg.classList.toggle('lit', isLit);
-                seg.classList.remove('seg-warning', 'seg-danger');
-                if (isLit && zone === 'danger')       seg.classList.add('seg-danger');
-                else if (isLit && zone === 'warning') seg.classList.add('seg-warning');
-            });
+        // Side stack — honest GPS accuracy/heading + ambient temp
+        // (replaces Ducati's EBC/DTC/ABS/DWC + oil-temp, no ECU exists)
+        Utils.setEl('techno-gps-acc',  this.gpsAccuracy  != null ? `±${this.gpsAccuracy} m` : '-- m');
+        Utils.setEl('techno-heading',  this.heading       != null ? `${this.heading}°`      : '--°');
+        Utils.setEl('techno-temp',     this.ambientTemp   != null ? `${this.ambientTemp}°C` : '--°C');
+
+        // Low battery warning — the only honest "warning box" this app
+        // can show (no side-stand/engine/ABS sensors exist)
+        const warnBox = document.getElementById('techno-battery-warn');
+        if (warnBox) {
+            const lvl = window.app?.batteryLevel;
+            warnBox.style.display = (typeof lvl === 'number' && lvl <= 15) ? 'block' : 'none';
         }
+
+        Utils.setEl('techno-trip', `${(window.tripComputer?.distanceKm ?? 0).toFixed(1)} km`);
+        Utils.setEl('techno-time', Utils.getCurrentTime());
+        Utils.setEl('techno-avg',  `${Math.round(window.tripComputer?.averageSpeed ?? 0)} km/h`);
     }
 
     _updateStatusBadge() {
